@@ -1,6 +1,8 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
-const ProviderCard = ({ provider }) => {
+const ProviderCard = ({ provider, config }) => {
+    const navigate = useNavigate();
     return (
         <div style={{
             background: 'var(--card)',
@@ -19,17 +21,20 @@ const ProviderCard = ({ provider }) => {
             <p style={{ color: 'var(--text)' }}>💰 Rs. {provider.price}</p>
             <p style={{ color: 'var(--text)' }}>⭐ {provider.rating}</p>
 
-            <button style={{
-                marginTop: '10px',
-                width: '100%',
-                padding: '10px',
-                borderRadius: '10px',
-                border: 'none',
-                background: 'var(--accent)',
-                color: 'white',
-                cursor: 'pointer',
-                fontWeight: '600'
-            }}>
+            <button
+                onClick={() => navigate('/order', { state: { provider, config } })}
+                style={{
+                    marginTop: '10px',
+                    width: '100%',
+                    padding: '10px',
+                    borderRadius: '10px',
+                    border: 'none',
+                    background: 'var(--accent)',
+                    color: 'white',
+                    cursor: 'pointer',
+                    fontWeight: '600'
+                }}
+            >
                 Select Provider
             </button>
         </div>

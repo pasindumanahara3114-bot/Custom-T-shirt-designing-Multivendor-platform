@@ -109,7 +109,7 @@ const ProductConfigPage = () => {
                         gap: '20px'
                     }}>
                         {filteredProviders.map(p => (
-                            <ProviderCard key={p.id} provider={p} />
+                            <ProviderCard key={p.id} provider={p} config={{ material, quantity }} />
                         ))}
                     </div>
                 </div>

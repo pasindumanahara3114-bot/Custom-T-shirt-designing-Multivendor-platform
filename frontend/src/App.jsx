@@ -10,6 +10,7 @@ import ProviderDashboard from './pages/Provider/ProviderDashboard';
 import SignupPage from './pages/Signup/SignupPage';
 import LoginPage from './pages/Login/LoginPage';
 import CustomerDashboard from './pages/Customer/CustomerDashboard';
+import OrderPage from './pages/Customer/OrderPage';
 import AdminDashboard from './pages/Admin/AdminDashboard';
 import { ThemeProvider } from './context/ThemeContext';
 
@@ -27,6 +28,7 @@ function App() {
           <Route path="/dashboard" element={<CustomerDashboard />} />
           <Route path="/design" element={<DesignPage />} />
           <Route path="/config" element={<ProductConfigPage />} />
+          <Route path="/order" element={<OrderPage />} />
           <Route path="/providers" element={<ProviderPage />} />
 
 
