@@ -6,6 +6,13 @@ import ControlPanel from '../../features/design-tool/components/ControlPanel';
 import DesignCanvas from '../../features/design-tool/components/DesignCanvas';
 import QuickGuide from '../../features/design-tool/components/QuickGuide';
 
+/**
+ * DesignPage Component
+ * 
+ * The primary interface for customers to create custom T-shirt designs.
+ * Captures design layers (images/text) and transitions to the product configuration flow 
+ * by passing the 'Blueprint JSON' and 'Preview' via location state.
+ */
 const DesignPage = () => {
   const navigate = useNavigate();
 
