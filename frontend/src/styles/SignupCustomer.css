@@ -1,0 +1,120 @@
+/* Modern signup styles */
+.signup-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(180deg, #f5f7ff 0%, #eef6ff 100%);
+  padding: 48px 16px;
+}
+
+.signup-card {
+  width: 420px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(16, 24, 40, 0.08);
+  padding: 28px 28px 24px;
+  border: 1px solid rgba(16, 24, 40, 0.03);
+}
+
+.signup-title {
+  margin: 0 0 4px;
+  font-size: 22px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.signup-sub {
+  margin: 0 0 18px;
+  color: #475569;
+  font-size: 13px;
+}
+
+.signup-form .field {
+  display: block;
+  margin-bottom: 14px;
+}
+
+.label {
+  display: block;
+  margin-bottom: 6px;
+  color: #334155;
+  font-size: 13px;
+}
+
+.input {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: #fff;
+  font-size: 14px;
+  color: #0f172a;
+  outline: none;
+  transition: box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.input:focus {
+  box-shadow: 0 6px 18px rgba(2,6,23,0.06);
+  border-color: #6366f1;
+}
+
+.input.error {
+  border-color: #ef4444;
+}
+
+.field-error {
+  display: block;
+  margin-top: 6px;
+  color: #ef4444;
+  font-size: 12px;
+}
+
+.form-error {
+  background: #fff1f2;
+  color: #b91c1c;
+  padding: 10px 12px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  font-size: 13px;
+}
+
+.form-success {
+  margin-top: 12px;
+  color: #065f46;
+  background: #ecfdf5;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.submit-btn {
+  width: 100%;
+  margin-top: 6px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: linear-gradient(90deg, #6366f1 0%, #7c3aed 100%);
+  color: #ffffff;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  font-size: 15px;
+  transition: transform 0.12s ease, opacity 0.12s ease;
+}
+
+.submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.signup-footer {
+  margin-top: 16px;
+  text-align: center;
+  color: #64748b;
+  font-size: 13px;
+}
+
+@media (max-width: 480px) {
+  .signup-card { width: 100%; padding: 20px; border-radius: 10px; }
+}
