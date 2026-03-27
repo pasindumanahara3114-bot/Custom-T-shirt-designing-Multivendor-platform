@@ -1,3 +1,6 @@
+/**
+ * PrinthubApplication - Main entry point for the PrintHub Backend.
+ */
 package com.printhub;
 
 import org.springframework.boot.SpringApplication;

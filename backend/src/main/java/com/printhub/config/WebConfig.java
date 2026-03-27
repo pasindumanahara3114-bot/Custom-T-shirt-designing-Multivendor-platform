@@ -1,3 +1,6 @@
+/**
+ * WebConfig - Global web configuration, including CORS settings.
+ */
 package com.printhub.config;
 
 import org.springframework.context.annotation.Configuration;
