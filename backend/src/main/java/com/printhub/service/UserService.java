@@ -28,6 +28,13 @@ public class UserService {
         return userRepository.findByEmail(email).map(this::mapToDTO);
     }
 
+    public UserDTO login(String email, String password) {
+        return userRepository.findByEmail(email)
+                .filter(user -> user.getPassword().equals(password)) // Simple check for now
+                .map(this::mapToDTO)
+                .orElseThrow(() -> new RuntimeException("Invalid credentials"));
+    }
+
     private UserDTO mapToDTO(User user) {
         return new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getRole());
     }
