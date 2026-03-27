@@ -1,3 +1,7 @@
+/**
+ * Order Entity - Represents a custom T-shirt print request.
+ * Stores high-resolution design URLs and the raw JSON master blueprint.
+ */
 package com.printhub.model;
 
 import jakarta.persistence.*;

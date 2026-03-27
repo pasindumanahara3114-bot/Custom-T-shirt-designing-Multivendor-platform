@@ -1,3 +1,7 @@
+/**
+ * VendorProfile Entity - Extension of User identity for printing businesses.
+ * Stores production capacity, pricing, and material specifications.
+ */
 package com.printhub.model;
 
 import jakarta.persistence.*;
@@ -24,7 +28,7 @@ public class VendorProfile {
 
     private String contact;
     private String location;
-    
+
     @Column(columnDefinition = "TEXT")
     private String description;
 

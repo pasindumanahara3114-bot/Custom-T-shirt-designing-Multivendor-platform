@@ -1,3 +1,7 @@
+/**
+ * User Entity - Core identity model for the platform.
+ * Supports Customers, Providers, and Administrators.
+ */
 package com.printhub.model;
 
 import jakarta.persistence.*;
