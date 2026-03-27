@@ -33,6 +33,10 @@ const mockProviders = [
     }
 ];
 
+/**
+ * ProductConfigPage Component - Manages material/qty selection and vendor filtering.
+ * Persists design blueprints from location state.
+ */
 const ProductConfigPage = () => {
     const navigate = useNavigate();
     const location = useLocation();

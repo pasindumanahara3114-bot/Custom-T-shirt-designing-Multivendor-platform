@@ -3,6 +3,9 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { ChevronLeft, Upload, Package, Calendar, User, Mail, Layers, Ruler } from 'lucide-react';
 import MainLayout from '../../layouts/MainLayout';
 
+/**
+ * OrderPage Component - Finalizes the order, consolidating design and quantity data.
+ */
 const OrderPage = () => {
     const location = useLocation();
     const navigate = useNavigate();

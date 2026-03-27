@@ -1,3 +1,13 @@
+/**
+ * VendorDashboard Component
+ * 
+ * Provides a comprehensive management portal for Vendors/Providers.
+ * Features:
+ * - Real-time production statistics and earnings overview.
+ * - Interactive Order Management with status-tracking and status-flow automation.
+ * - 'Smart Design Parser' for production-ready blueprint analysis (DPI, Fonts).
+ * - Vendor Profile configuration for materials, capacity, and pricing.
+ */
 import React, { useState } from 'react';
 import {
     LayoutDashboard,
@@ -26,7 +36,7 @@ const VendorDashboard = () => {
     const { theme, toggleTheme } = useTheme();
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('dashboard');
-    const [selectedDesign, setSelectedDesign] = useState(null);
+    const [selectedDesign, setSelectedDesign] = useState(null); // Holds full order object for modal parser
 
     // Mock States - with richer designJSON representing a parsed structure
     const [orders, setOrders] = useState([
@@ -173,6 +183,10 @@ const VendorDashboard = () => {
                     )}
                 </div>
 
+                {/* 
+                  DESIGN PREVIEW & BLUEPRINT MODAL 
+                  Parses order.designJSON to display individual production layers (Image/Text) 
+                */}
                 {selectedDesign && (
                     <div
                         onClick={() => setSelectedDesign(null)}
@@ -300,7 +314,9 @@ const VendorDashboard = () => {
     );
 };
 
-// Sub-components
+/**
+ * DashboardView - Home screen for vendors showing high-level stats and recent activity.
+ */
 const DashboardView = ({ stats, orders, updateStatus, getStatusColor, setSelectedDesign }) => (
     <>
         <header style={{ marginBottom: '40px' }}>
@@ -322,6 +338,9 @@ const DashboardView = ({ stats, orders, updateStatus, getStatusColor, setSelecte
     </>
 );
 
+/**
+ * OrdersManagementView - Detailed order pipeline with status-based filtering.
+ */
 const OrdersManagementView = ({ orders, updateStatus, getStatusColor, setSelectedDesign }) => {
     const [filter, setFilter] = useState('All');
     const filteredOrders = filter === 'All' ? orders : orders.filter(o => o.status === filter);
@@ -361,6 +380,9 @@ const OrdersManagementView = ({ orders, updateStatus, getStatusColor, setSelecte
     );
 };
 
+/**
+ * OrdersTable - Reusable component for rendering order lists across different views.
+ */
 const OrdersTable = ({ orders, updateStatus, getStatusColor, setSelectedDesign }) => (
     <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
         <thead>
