@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { Mail, Lock, LogIn } from 'lucide-react';
-import MainLayout from '../../layouts/MainLayout';
+import { Lock, LogIn, Mail } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { authService } from '../../api';
+import MainLayout from '../../layouts/MainLayout.jsx';
 
 const LoginPage = () => {
     const navigate = useNavigate();
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
     const [formData, setFormData] = useState({
         email: '',
         password: ''
@@ -14,11 +17,36 @@ const LoginPage = () => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log("Logging in with:", formData);
-        alert(`Logged in as ${formData.email}`);
-        navigate('/');
+        setError('');
+        setLoading(true);
+
+        try {
+            // Real login call with email and password
+            const user = await authService.login({
+                email: formData.email,
+                password: formData.password
+            });
+
+            console.log("Login successful:", user);
+
+            // Role-based redirection
+            if (user.role === 'CUSTOMER') {
+                navigate('/dashboard');
+            } else if (user.role === 'PROVIDER') {
+                navigate('/provider/dashboard');
+            } else if (user.role === 'ADMIN') {
+                navigate('/admin');
+            } else {
+                navigate('/');
+            }
+        } catch (err) {
+            console.error("Login failed:", err);
+            setError(err.response?.data?.message || 'Invalid email or password. Please try again.');
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -89,9 +117,16 @@ const LoginPage = () => {
                             </a>
                         </div>
 
-                        <button type="submit" className="primaryBtn" style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                        {error && <div style={{ color: 'var(--accent)', fontSize: '13px', marginBottom: '15px', textAlign: 'center' }}>{error}</div>}
+
+                        <button
+                            type="submit"
+                            className="primaryBtn"
+                            style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+                            disabled={loading}
+                        >
                             <LogIn size={18} />
-                            Sign In
+                            {loading ? 'Signing In...' : 'Sign In'}
                         </button>
                     </form>
 

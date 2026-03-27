@@ -63,12 +63,18 @@ const DesignCanvas = ({
         fabric.Image.fromURL(
             url,
             (img) => {
-                if (!img) {
-                    console.error("❌ Image failed to load");
+                const currentCanvas = canvasInstance.current;
+                if (!img || !currentCanvas) {
+                    console.warn("⚠️ Image loaded but canvas is null or disposed");
                     return;
                 }
 
-                canvas.clear();
+                try {
+                    currentCanvas.clear();
+                } catch (e) {
+                    console.error("❌ Failed to clear canvas (likely disposed):", e);
+                    return;
+                }
 
                 img.set({
                     selectable: false,
@@ -91,15 +97,15 @@ const DesignCanvas = ({
 
                 shirtImgRef.current = img;
 
-                canvas.add(img);
-                canvas.sendToBack(img);
+                currentCanvas.add(img);
+                currentCanvas.sendToBack(img);
 
                 console.log("✅ Image loaded successfully");
 
-                applyTint();
-                restoreDesign();
+                applyTint(); // applyTint already uses canvasInstance.current
+                restoreDesign(); // restoreDesign already uses canvasInstance.current
 
-                canvas.renderAll();
+                currentCanvas.renderAll();
             },
             {
                 crossOrigin: 'anonymous' // 🔥 IMPORTANT

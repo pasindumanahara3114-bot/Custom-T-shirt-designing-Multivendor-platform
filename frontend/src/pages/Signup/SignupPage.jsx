@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { ChevronDown, User, Building2, ShieldCheck } from 'lucide-react';
-import MainLayout from '../../layouts/MainLayout';
+import { Building2, ChevronDown, ShieldCheck, User } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { authService } from '../../api';
+import MainLayout from '../../layouts/MainLayout.jsx';
 
 const SignupPage = () => {
     const navigate = useNavigate();
     const [role, setRole] = useState('customer');
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
 
     const [formData, setFormData] = useState({
         name: '',
@@ -27,11 +30,33 @@ const SignupPage = () => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log("Signing up as:", role, formData);
-        alert(`Welcome, ${formData.name}! Signed up as ${role.toUpperCase()}.`);
-        navigate('/');
+        setError('');
+
+        if (formData.password !== formData.confirmPassword) {
+            setError('Passwords do not match');
+            return;
+        }
+
+        setLoading(true);
+        try {
+            const signupData = {
+                name: formData.name,
+                email: formData.email,
+                password: formData.password,
+                role: role.toUpperCase()
+            };
+
+            await authService.signup(signupData);
+            alert(`Welcome, ${formData.name}! Your account has been created.`);
+            navigate('/login');
+        } catch (err) {
+            console.error("Signup failed:", err);
+            setError(err.response?.data?.message || 'Failed to create account. Please try again.');
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -128,8 +153,28 @@ const SignupPage = () => {
                             />
                         </div>
 
-                        <button type="submit" className="primaryBtn" style={{ width: '100%', marginTop: '10px' }}>
-                            Create Account
+                        <div className="form-group">
+                            <label>Confirm Password</label>
+                            <input
+                                type="password"
+                                name="confirmPassword"
+                                className="field"
+                                placeholder="••••••••"
+                                value={formData.confirmPassword}
+                                onChange={handleChange}
+                                required
+                            />
+                        </div>
+
+                        {error && <div style={{ color: 'var(--accent)', fontSize: '13px', marginBottom: '10px', textAlign: 'center' }}>{error}</div>}
+
+                        <button
+                            type="submit"
+                            className="primaryBtn"
+                            style={{ width: '100%', marginTop: '10px' }}
+                            disabled={loading}
+                        >
+                            {loading ? 'Creating Account...' : 'Create Account'}
                         </button>
                     </form>
 

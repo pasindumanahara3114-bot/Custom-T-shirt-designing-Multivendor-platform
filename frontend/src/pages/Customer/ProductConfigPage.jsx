@@ -1,37 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import MainLayout from '../../layouts/MainLayout';
-import ProviderCard from '../../components/shared/ProviderCard';
-
-const mockProviders = [
-    {
-        id: 1,
-        name: "PrintHub Lanka",
-        materials: ["cotton", "polyester"],
-        minQty: 10,
-        maxQty: 500,
-        price: 1200,
-        rating: 4.5
-    },
-    {
-        id: 2,
-        name: "FastPrint",
-        materials: ["cotton"],
-        minQty: 1,
-        maxQty: 50,
-        price: 1500,
-        rating: 4.2
-    },
-    {
-        id: 3,
-        name: "BulkWear",
-        materials: ["polyester"],
-        minQty: 50,
-        maxQty: 1000,
-        price: 900,
-        rating: 4.8
-    }
-];
+import { vendorService } from '../../api';
+import MainLayout from '../../layouts/MainLayout.jsx';
+import ProviderCard from '../../components/shared/ProviderCard.jsx';
 
 /**
  * ProductConfigPage Component - Manages material/qty selection and vendor filtering.
@@ -44,12 +15,29 @@ const ProductConfigPage = () => {
 
     const [material, setMaterial] = useState('cotton');
     const [quantity, setQuantity] = useState(10);
+    const [providers, setProviders] = useState([]);
+    const [loading, setLoading] = useState(false);
 
-    const filteredProviders = mockProviders.filter(p =>
-        p.materials.includes(material) &&
-        quantity >= p.minQty &&
-        quantity <= p.maxQty
-    );
+    useEffect(() => {
+        const fetchProviders = async () => {
+            setLoading(true);
+            try {
+                // Fetch eligible vendors from backend
+                const data = await vendorService.getEligibleVendors(material, quantity);
+                setProviders(data);
+            } catch (err) {
+                console.error("Failed to fetch providers:", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchProviders();
+    }, [material, quantity]);
+
+    // Local filtering can still be applied if the backend returns all vendors but frontend wants to refine,
+    // though getEligibleVendors should ideally handle most of it.
+    const filteredProviders = providers || [];
 
     return (
         <MainLayout>
@@ -95,7 +83,9 @@ const ProductConfigPage = () => {
                         View All Eligible Providers
                     </button>
 
-                    {filteredProviders.length === 0 && (
+                    {loading ? (
+                        <div style={{ textAlign: 'center', padding: '40px', color: 'var(--muted)' }}>Fetching the best printing providers...</div>
+                    ) : filteredProviders.length === 0 && (
                         <div style={{
                             padding: '40px',
                             background: 'var(--card)',

@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import axios from 'axios';
+import { vendorService } from '../../api';
 import MainLayout from "../../layouts/MainLayout";
 
 const ProviderPage = () => {
   const { state } = useLocation();
   const { material, quantity } = state || {};
   const [providers, setProviders] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (material && quantity) {
@@ -15,11 +16,14 @@ const ProviderPage = () => {
   }, [material, quantity]);
 
   const fetchProviders = async () => {
+    setLoading(true);
     try {
-      const res = await axios.get(`/api/providers/eligible?material=${material}&quantity=${quantity}`);
-      setProviders(res.data);
+      const data = await vendorService.getEligibleVendors(material, quantity);
+      setProviders(data);
     } catch (error) {
       console.error("Error fetching providers", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -27,7 +31,9 @@ const ProviderPage = () => {
     <MainLayout>
       <div style={{ padding: '40px' }}>
         <h2>Available Providers</h2>
-        {providers.length === 0 ? (
+        {loading ? (
+          <p>Finding the best providers for you...</p>
+        ) : providers.length === 0 ? (
           <p>No providers match your requirements</p>
         ) : (
           providers.map((p, index) => (

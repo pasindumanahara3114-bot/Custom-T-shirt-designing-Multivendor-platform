@@ -1,16 +1,17 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ChevronLeft, Upload, Package, Calendar, User, Mail, Layers, Ruler } from 'lucide-react';
-import MainLayout from '../../layouts/MainLayout';
+import { orderService } from '../../api';
+import MainLayout from '../../layouts/MainLayout.jsx';
 
-/**
- * OrderPage Component - Finalizes the order, consolidating design and quantity data.
- */
 const OrderPage = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const { provider, config } = location.state || { provider: { name: 'Universal Printer' }, config: {} };
     const { designs } = config || {};
+
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
 
     const [formData, setFormData] = useState({
         name: '',
@@ -40,16 +41,33 @@ const OrderPage = () => {
         }
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log("Placing order for Vendor:", {
-            ...formData,
-            providerId: provider.id,
-            designUrl: previewImage,
-            designJSON: designJSON
-        });
-        alert(`✅ Order placed successfully with ${provider.name}!`);
-        navigate('/dashboard');
+        setError('');
+        setLoading(true);
+
+        try {
+            const orderPayload = {
+                name: formData.name,
+                email: formData.email,
+                material: formData.material,
+                quantity: formData.quantity,
+                size: formData.size,
+                designUrl: previewImage,
+                designJson: designJSON,
+                vendorId: provider.id,
+                status: 'PLACED'
+            };
+
+            await orderService.placeOrder(orderPayload);
+            alert(`✅ Order placed successfully with ${provider.name}!`);
+            navigate('/dashboard');
+        } catch (err) {
+            console.error("Order placement failed:", err);
+            setError(err.response?.data?.message || 'Failed to place order. Please try again.');
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -162,8 +180,15 @@ const OrderPage = () => {
                             </div>
                         </div>
 
-                        <button type="submit" className="navBtn" style={{ width: '100%', padding: '16px', marginTop: '10px' }}>
-                            Place Order with {provider.name}
+                        {error && <div style={{ color: 'var(--accent)', fontSize: '13px', marginBottom: '10px', textAlign: 'center' }}>{error}</div>}
+
+                        <button
+                            type="submit"
+                            className="navBtn"
+                            style={{ width: '100%', padding: '16px', marginTop: '10px' }}
+                            disabled={loading}
+                        >
+                            {loading ? 'Placing Order...' : `Place Order with ${provider.name}`}
                         </button>
                     </form>
 

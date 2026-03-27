@@ -8,7 +8,8 @@
  * - 'Smart Design Parser' for production-ready blueprint analysis (DPI, Fonts).
  * - Vendor Profile configuration for materials, capacity, and pricing.
  */
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { vendorService, orderService } from '../../api';
 import {
     LayoutDashboard,
     Package,
@@ -36,32 +37,40 @@ const VendorDashboard = () => {
     const { theme, toggleTheme } = useTheme();
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('dashboard');
-    const [selectedDesign, setSelectedDesign] = useState(null); // Holds full order object for modal parser
+    const [selectedDesign, setSelectedDesign] = useState(null);
+    const [orders, setOrders] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-    // Mock States - with richer designJSON representing a parsed structure
-    const [orders, setOrders] = useState([
-        {
-            id: 'ORD-1045', customer: 'Udula', material: 'Cotton', qty: 5, status: 'Placed', date: '2024-03-27',
-            designUrl: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&q=80&w=200',
-            designJSON: JSON.stringify({
-                elements: [
-                    { type: 'image', src: 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?w=50', width: 800, height: 600, dpi: 300, printArea: 'Front' },
-                    { type: 'text', text: 'URBAN WARRIOR', fontFamily: 'Impact', fontSize: 48, printArea: 'Front' }
-                ]
-            })
-        },
-        {
-            id: 'ORD-1042', customer: 'Saman', material: 'Polyester', qty: 10, status: 'Accepted', date: '2024-03-26',
-            designUrl: 'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&q=80&w=200',
-            designJSON: JSON.stringify({
-                elements: [
-                    { type: 'image', src: 'https://images.unsplash.com/photo-1491553895911-0055eca6402d?w=50', width: 400, height: 400, dpi: 150, printArea: 'Back' }
-                ]
-            })
-        },
-        { id: 'ORD-1039', customer: 'Kamal', material: 'Cotton', qty: 2, status: 'In Production', date: '2024-03-25', designUrl: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&q=80&w=200', designJSON: '{"elements":[]}' },
-        { id: 'ORD-1035', customer: 'Nimal', material: 'Linen', qty: 8, status: 'Ready for Delivery', date: '2024-03-24', designUrl: 'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&q=80&w=200', designJSON: '{"elements":[]}' },
-    ]);
+    useEffect(() => {
+        const fetchOrders = async () => {
+            setLoading(true);
+            try {
+                // For now, using a hardcoded vendorId=1. 
+                // In a real app, this would come from the logged-in user context.
+                const data = await orderService.getVendorOrders(1);
+
+                // Map API DTO to the expected local format if necessary
+                const mappedData = data.map(o => ({
+                    id: o.id,
+                    customer: o.customerName || 'Unknown',
+                    material: o.material,
+                    qty: o.quantity,
+                    status: o.status,
+                    date: o.orderDate ? o.orderDate.split('T')[0] : 'N/A',
+                    designUrl: o.designUrl,
+                    designJSON: o.designJson
+                }));
+
+                setOrders(mappedData);
+            } catch (err) {
+                console.error("Failed to fetch vendor orders:", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchOrders();
+    }, []);
 
     const [profile, setProfile] = useState({
         businessName: 'FastPrint Designs',
@@ -81,16 +90,28 @@ const VendorDashboard = () => {
         earnings: 'Rs. 45,200'
     };
 
-    const updateStatus = (orderId) => {
-        setOrders(prev => prev.map(order => {
-            if (order.id === orderId) {
-                const statusFlow = ['Placed', 'Accepted', 'In Production', 'Ready for Delivery'];
-                const currentIndex = statusFlow.indexOf(order.status);
-                const nextStatus = statusFlow[currentIndex + 1] || order.status;
-                return { ...order, status: nextStatus };
-            }
-            return order;
-        }));
+    const updateStatus = async (orderId) => {
+        const order = orders.find(o => o.id === orderId);
+        if (!order) return;
+
+        const statusFlow = ['Placed', 'Accepted', 'In Production', 'Ready for Delivery'];
+        const currentIndex = statusFlow.indexOf(order.status);
+        const nextStatus = statusFlow[currentIndex + 1];
+
+        if (!nextStatus) return;
+
+        try {
+            // Update on backend
+            await orderService.updateOrderStatus(orderId, nextStatus.toUpperCase().replace(/ /g, '_'));
+
+            // Update local state
+            setOrders(prev => prev.map(o =>
+                o.id === orderId ? { ...o, status: nextStatus } : o
+            ));
+        } catch (err) {
+            console.error("Failed to update status:", err);
+            alert("Failed to update status on server.");
+        }
     };
 
     const getStatusColor = (status) => {
@@ -264,7 +285,7 @@ const VendorDashboard = () => {
 
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                                 <button
-                                    onClick={() => alert(`Initiating download of Backend-Rendered HD Print File for ${selectedDesign.id}...`)}
+                                    onClick={() => orderService.downloadHDPreview(selectedDesign.id)}
                                     className="navBtn"
                                     style={{ width: '100%', padding: '14px', fontSize: '14px', fontWeight: '500', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
                                 >
@@ -273,7 +294,7 @@ const VendorDashboard = () => {
 
 
                                 <button
-                                    onClick={() => alert(`Initiating download of raw Master JSON blueprint for ${selectedDesign.id}...`)}
+                                    onClick={() => orderService.downloadBlueprint(selectedDesign.id)}
                                     style={{
                                         width: '100%', padding: '14px', fontSize: '14px', fontWeight: '500',
                                         display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',

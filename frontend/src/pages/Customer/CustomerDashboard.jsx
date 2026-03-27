@@ -1,17 +1,42 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, ShoppingBag, Heart, Clock, ChevronRight, Sun, Moon, LogOut, User } from 'lucide-react';
+import { Plus, ShoppingBag, Heart, Clock, ChevronRight, Sun, Moon, LogOut, User, Download } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
+import { orderService } from '../../api';
 
 const CustomerDashboard = () => {
     const navigate = useNavigate();
     const { theme, toggleTheme } = useTheme();
     const [activeTab, setActiveTab] = useState('orders');
+    const [recentOrders, setRecentOrders] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-    const recentOrders = [
-        { id: 'ORD-7721', date: '2024-03-20', status: 'In Production', price: 'Rs. 4,500', items: 3, image: '/design/hero-shirt.png' },
-        { id: 'ORD-6540', date: '2024-03-15', status: 'Delivered', price: 'Rs. 1,200', items: 1, image: '/images/t1.jpg' },
-    ];
+    useEffect(() => {
+        const fetchOrders = async () => {
+            setLoading(true);
+            try {
+                // For now, using a hardcoded customerId=1.
+                const data = await orderService.getCustomerOrders(1);
+
+                const mappedData = data.map(o => ({
+                    id: o.id,
+                    date: o.orderDate ? o.orderDate.split('T')[0] : 'N/A',
+                    status: o.status,
+                    price: `Rs. ${o.totalPrice.toLocaleString()}`,
+                    items: o.quantity,
+                    image: o.designUrl || '/design/hero-shirt.png'
+                }));
+
+                setRecentOrders(mappedData);
+            } catch (err) {
+                console.error("Failed to fetch customer orders:", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchOrders();
+    }, []);
 
     const savedDesigns = [
         { id: 1, name: 'Summer Vibes V1', date: '2 mins ago', image: '/images/t2.jpg' },
@@ -115,7 +140,12 @@ const CustomerDashboard = () => {
                                             </div>
                                             <div className="order-row-bottom">
                                                 <span className="order-price">{order.price}</span>
-                                                <button className="track-btn">Track Order</button>
+                                                <div style={{ display: 'flex', gap: '8px' }}>
+                                                    <button onClick={() => orderService.downloadBlueprint(order.id)} className="track-btn" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid var(--stroke)' }}>
+                                                        <Download size={14} />
+                                                    </button>
+                                                    <button className="track-btn">Track Order</button>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
