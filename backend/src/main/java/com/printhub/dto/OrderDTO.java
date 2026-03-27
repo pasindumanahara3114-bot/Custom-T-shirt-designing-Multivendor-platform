@@ -1,3 +1,7 @@
+/**
+ * OrderDTO - Data Transfer Object for production order data.
+ * Used for API responses to the frontend.
+ */
 package com.printhub.dto;
 
 import com.printhub.model.Order.OrderStatus;
