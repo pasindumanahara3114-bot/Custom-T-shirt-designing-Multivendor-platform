@@ -1,6 +1,9 @@
 import React from 'react';
+import { useTheme } from '../../context/ThemeContext';
 
 const Topbar = ({ side, shirtStyle }) => {
+    const { theme, toggleTheme } = useTheme();
+
     return (
         <div className="topbar">
             <div className="brand">
@@ -11,7 +14,13 @@ const Topbar = ({ side, shirtStyle }) => {
                 </div>
             </div>
 
-            <div className="badges">
+            <div className="badges" style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                <div className="theme-toggle" onClick={toggleTheme} title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}>
+                    <div className="theme-toggle-thumb">
+                        {theme === 'light' ? '☀️' : '🌙'}
+                    </div>
+                </div>
+
                 <div className="badge">View <span className="pill">{side.toUpperCase()}</span></div>
                 <div className="badge">Style <span className="pill">{shirtStyle === "crew" ? "NO COLLAR" : "COLLAR"}</span></div>
                 <div className="badge mini">Tip <span className="kbd">Select</span> object before color / delete</div>

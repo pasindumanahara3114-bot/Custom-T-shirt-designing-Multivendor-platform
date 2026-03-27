@@ -4,7 +4,6 @@ import Topbar from '../components/customizeTool/Topbar';
 import ControlPanel from '../components/customizeTool/ControlPanel';
 import DesignCanvas from '../components/customizeTool/DesignCanvas';
 import QuickGuide from '../components/customizeTool/QuickGuide';
-import '../styles/App.css';
 
 const DesignPage = () => {
   const navigate = useNavigate();

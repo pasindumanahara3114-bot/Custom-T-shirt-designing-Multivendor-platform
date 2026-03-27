@@ -33,6 +33,7 @@ const mockProviders = [
 ];
 
 const ProductConfigPage = () => {
+    const navigate = useNavigate();
 
     const [material, setMaterial] = useState('cotton');
     const [size, setSize] = useState('M');
@@ -46,13 +47,13 @@ const ProductConfigPage = () => {
     );
 
     return (
-        <div style={{ display: 'flex', minHeight: '100vh', background: '#0f172a', color: '#fff' }}>
+        <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg1)', color: 'var(--text)', padding: '40px' }}>
 
             {/* LEFT PANEL */}
             <div style={{
                 width: '320px',
                 padding: '24px',
-                borderRight: '1px solid #1e293b'
+                borderRight: '1px solid var(--stroke)'
             }}>
                 <h2 style={{ marginBottom: '20px' }}>Customize Product</h2>
 
@@ -89,7 +90,7 @@ const ProductConfigPage = () => {
                     className="field"
                 />
 
-                <div style={{ marginTop: '20px', fontSize: '14px', color: '#94a3b8' }}>
+                <div style={{ marginTop: '20px', fontSize: '14px', color: 'var(--muted)', background: 'var(--card)', border: '1px solid var(--stroke)', padding: '10px', borderRadius: '8px' }}>
                     Vendors are automatically filtered based on your selection.
                 </div>
             </div>
@@ -101,7 +102,7 @@ const ProductConfigPage = () => {
                     Available Providers ({filteredProviders.length})
                 </h2>
                 <button
-                    style={{ marginBottom: '16px', padding: '10px 16px', borderRadius: '8px', background: '#22c55e', border: 'none', color: '#fff', fontWeight: '700', cursor: 'pointer' }}
+                    style={{ marginBottom: '16px', padding: '10px 16px', borderRadius: '8px', background: 'var(--good)', border: 'none', color: '#fff', fontWeight: '700', cursor: 'pointer' }}
                     onClick={() => navigate('/providers', { state: { material, quantity } })}
                 >
                     View All Eligible Providers
@@ -111,10 +112,11 @@ const ProductConfigPage = () => {
                 {filteredProviders.length === 0 && (
                     <div style={{
                         padding: '40px',
-                        background: '#020617',
+                        background: 'var(--card)',
+                        border: '1px solid var(--stroke)',
                         borderRadius: '12px',
                         textAlign: 'center',
-                        color: '#94a3b8'
+                        color: 'var(--muted)'
                     }}>
                         ❌ No providers match your requirements
                     </div>
