@@ -6,7 +6,7 @@ import LandingPage from './pages/Landing/LandingPage';
 import DesignPage from './pages/Customer/DesignPage';
 import ProductConfigPage from './pages/Customer/ProductConfigPage';
 import ProviderPage from './pages/Provider/ProviderPage';
-import ProviderDashboard from './pages/Provider/ProviderDashboard';
+import VendorDashboard from './pages/Provider/VendorDashboard';
 import SignupPage from './pages/Signup/SignupPage';
 import LoginPage from './pages/Login/LoginPage';
 import CustomerDashboard from './pages/Customer/CustomerDashboard';
@@ -34,7 +34,7 @@ function App() {
 
 
           {/* Provider Routes */}
-          <Route path="/provider-dashboard" element={<ProviderDashboard />} />
+          <Route path="/provider/dashboard" element={<VendorDashboard />} />
           <Route path="/providers" element={<ProviderPage />} />
 
           {/* Admin Routes */}
