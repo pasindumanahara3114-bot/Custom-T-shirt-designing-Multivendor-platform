@@ -1,3 +1,6 @@
+/**
+ * VendorProfileRepository - Data access for business profile records.
+ */
 package com.printhub.repository;
 
 import com.printhub.model.VendorProfile;

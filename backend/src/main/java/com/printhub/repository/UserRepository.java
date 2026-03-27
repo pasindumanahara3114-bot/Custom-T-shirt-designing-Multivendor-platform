@@ -1,3 +1,6 @@
+/**
+ * UserRepository - Data access for user identity records.
+ */
 package com.printhub.repository;
 
 import com.printhub.model.User;
