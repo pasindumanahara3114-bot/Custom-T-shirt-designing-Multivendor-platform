@@ -34,6 +34,13 @@ public class VendorController {
         return ResponseEntity.ok(vendorService.getVendorById(id));
     }
 
+    @GetMapping("/eligible")
+    public ResponseEntity<List<VendorProfile>> getEligibleVendors(
+            @RequestParam String material,
+            @RequestParam Integer quantity) {
+        return ResponseEntity.ok(vendorService.getEligibleVendors(material, quantity));
+    }
+
     /**
      * Updates a vendor's business profile (Pricing, Capacity, Materials).
      * 

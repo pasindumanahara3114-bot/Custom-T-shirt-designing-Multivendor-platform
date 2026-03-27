@@ -29,6 +29,11 @@ public class AuthController {
         return ResponseEntity.ok(userService.registerUser(user));
     }
 
+    @PostMapping("/login")
+    public ResponseEntity<UserDTO> login(@RequestBody User user) {
+        return ResponseEntity.ok(userService.login(user.getEmail(), user.getPassword()));
+    }
+
     @GetMapping("/user/{email}")
     public ResponseEntity<UserDTO> getUser(@PathVariable String email) {
         return userService.getUserByEmail(email)

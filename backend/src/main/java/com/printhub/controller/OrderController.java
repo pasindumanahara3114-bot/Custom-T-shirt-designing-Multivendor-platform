@@ -6,7 +6,6 @@
 package com.printhub.controller;
 
 import com.printhub.dto.OrderDTO;
-import com.printhub.model.Order;
 import com.printhub.model.Order.OrderStatus;
 import com.printhub.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,20 +23,25 @@ public class OrderController {
 
     /**
      * Submits a new custom design order.
-     * Captures essential production metadata: designUrl (preview) and designJson
-     * (blueprint).
-     * 
-     * @param order The order entity from the customer.
-     * @return The persisted order as a DTO.
      */
     @PostMapping
-    public ResponseEntity<OrderDTO> placeOrder(@RequestBody Order order) {
-        return ResponseEntity.ok(orderService.placeOrder(order));
+    public ResponseEntity<OrderDTO> placeOrder(@RequestBody com.printhub.dto.OrderRequestDTO orderRequest) {
+        return ResponseEntity.ok(orderService.placeOrder(orderRequest));
     }
 
     @GetMapping
     public ResponseEntity<List<OrderDTO>> getAllOrders() {
         return ResponseEntity.ok(orderService.getAllOrders());
+    }
+
+    @GetMapping("/vendor/{vendorId}")
+    public ResponseEntity<List<OrderDTO>> getVendorOrders(@PathVariable Long vendorId) {
+        return ResponseEntity.ok(orderService.getOrdersByVendorId(vendorId));
+    }
+
+    @GetMapping("/customer/{customerId}")
+    public ResponseEntity<List<OrderDTO>> getCustomerOrders(@PathVariable Long customerId) {
+        return ResponseEntity.ok(orderService.getOrdersByCustomerId(customerId));
     }
 
     /**
@@ -54,5 +58,33 @@ public class OrderController {
             @PathVariable String id,
             @RequestParam OrderStatus status) {
         return ResponseEntity.ok(orderService.updateStatus(id, status));
+    }
+
+    @GetMapping("/{id}/blueprint")
+    public ResponseEntity<byte[]> downloadBlueprint(@PathVariable String id) {
+        OrderDTO order = orderService.getAllOrders().stream()
+                .filter(o -> o.getId().equals(id))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        byte[] content = order.getDesignJson().getBytes();
+        return ResponseEntity.ok()
+                .header("Content-Disposition", "attachment; filename=\"" + id + "-blueprint.json\"")
+                .header("Content-Type", "application/json")
+                .body(content);
+    }
+
+    @GetMapping("/{id}/hd-preview")
+    public ResponseEntity<byte[]> downloadHDPreview(@PathVariable String id) {
+        OrderDTO order = orderService.getAllOrders().stream()
+                .filter(o -> o.getId().equals(id))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        // Redirecting or serving the original design URL
+        // If it's a data URL (base64) from fabric.js, we should handle it
+        return ResponseEntity.status(302)
+                .header("Location", order.getDesignUrl())
+                .build();
     }
 }

@@ -30,4 +30,5 @@ public class OrderDTO {
     private String designUrl;
     private String designJson;
     private Double totalPrice;
+    private String customerName;
 }
