@@ -7,6 +7,7 @@ const OrderPage = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const { provider, config } = location.state || { provider: { name: 'Universal Printer' }, config: {} };
+    const { designs } = config || {};
 
     const [formData, setFormData] = useState({
         name: '',
@@ -17,7 +18,8 @@ const OrderPage = () => {
         size: 'M'
     });
 
-    const [previewImage, setPreviewImage] = useState(null);
+    const [previewImage, setPreviewImage] = useState(designs?.frontPreview || null);
+    const [designJSON, setDesignJSON] = useState(designs?.designJSON || '');
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -37,6 +39,12 @@ const OrderPage = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        console.log("Placing order for Vendor:", {
+            ...formData,
+            providerId: provider.id,
+            designUrl: previewImage,
+            designJSON: designJSON
+        });
         alert(`✅ Order placed successfully with ${provider.name}!`);
         navigate('/dashboard');
     };

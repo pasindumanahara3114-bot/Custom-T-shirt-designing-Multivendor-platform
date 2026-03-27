@@ -16,7 +16,8 @@ import {
     Moon,
     Eye,
     ImageIcon,
-    Download
+    Download,
+    Type
 } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { useNavigate } from 'react-router-dom';
@@ -27,12 +28,29 @@ const VendorDashboard = () => {
     const [activeTab, setActiveTab] = useState('dashboard');
     const [selectedDesign, setSelectedDesign] = useState(null);
 
-    // Mock States
+    // Mock States - with richer designJSON representing a parsed structure
     const [orders, setOrders] = useState([
-        { id: 'ORD-1045', customer: 'Udula', material: 'Cotton', qty: 5, status: 'Placed', date: '2024-03-27', designUrl: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&q=80&w=200', designJSON: '{"objects":[]}' },
-        { id: 'ORD-1042', customer: 'Saman', material: 'Polyester', qty: 10, status: 'Accepted', date: '2024-03-26', designUrl: 'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&q=80&w=200', designJSON: '{"objects":[]}' },
-        { id: 'ORD-1039', customer: 'Kamal', material: 'Cotton', qty: 2, status: 'In Production', date: '2024-03-25', designUrl: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&q=80&w=200', designJSON: '{"objects":[]}' },
-        { id: 'ORD-1035', customer: 'Nimal', material: 'Linen', qty: 8, status: 'Ready for Delivery', date: '2024-03-24', designUrl: 'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&q=80&w=200', designJSON: '{"objects":[]}' },
+        {
+            id: 'ORD-1045', customer: 'Udula', material: 'Cotton', qty: 5, status: 'Placed', date: '2024-03-27',
+            designUrl: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&q=80&w=200',
+            designJSON: JSON.stringify({
+                elements: [
+                    { type: 'image', src: 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?w=50', width: 800, height: 600, dpi: 300, printArea: 'Front' },
+                    { type: 'text', text: 'URBAN WARRIOR', fontFamily: 'Impact', fontSize: 48, printArea: 'Front' }
+                ]
+            })
+        },
+        {
+            id: 'ORD-1042', customer: 'Saman', material: 'Polyester', qty: 10, status: 'Accepted', date: '2024-03-26',
+            designUrl: 'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&q=80&w=200',
+            designJSON: JSON.stringify({
+                elements: [
+                    { type: 'image', src: 'https://images.unsplash.com/photo-1491553895911-0055eca6402d?w=50', width: 400, height: 400, dpi: 150, printArea: 'Back' }
+                ]
+            })
+        },
+        { id: 'ORD-1039', customer: 'Kamal', material: 'Cotton', qty: 2, status: 'In Production', date: '2024-03-25', designUrl: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&q=80&w=200', designJSON: '{"elements":[]}' },
+        { id: 'ORD-1035', customer: 'Nimal', material: 'Linen', qty: 8, status: 'Ready for Delivery', date: '2024-03-24', designUrl: 'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&q=80&w=200', designJSON: '{"elements":[]}' },
     ]);
 
     const [profile, setProfile] = useState({
@@ -158,38 +176,90 @@ const VendorDashboard = () => {
                 {selectedDesign && (
                     <div
                         onClick={() => setSelectedDesign(null)}
-                        style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(8px)' }}
+                        style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(8px)', overflowY: 'auto', padding: '40px 0' }}
                     >
                         <div
                             onClick={e => e.stopPropagation()}
                             className="glass"
-                            style={{ padding: '32px', position: 'relative', maxWidth: '500px', width: '90%', animation: 'modalFadeIn 0.3s ease-out' }}
+                            style={{ padding: '32px', position: 'relative', maxWidth: '600px', width: '90%', animation: 'modalFadeIn 0.3s ease-out', margin: 'auto' }}
                         >
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
                                 <div>
                                     <h3 style={{ fontSize: '20px', marginBottom: '4px' }}>Customer Design Overview</h3>
-                                    <p style={{ color: 'var(--muted)', fontSize: '14px' }}>Access preview and production master files.</p>
+                                    <p style={{ color: 'var(--muted)', fontSize: '14px' }}>Order: {selectedDesign.id} • Access preview and production master files.</p>
                                 </div>
                                 <LogOut size={20} style={{ color: 'var(--muted)', cursor: 'pointer' }} onClick={() => setSelectedDesign(null)} />
                             </div>
 
                             <img
-                                src={selectedDesign}
+                                src={selectedDesign.designUrl}
                                 alt="Design Preview"
                                 style={{ width: '100%', borderRadius: '12px', border: '1px solid var(--stroke)', marginBottom: '24px' }}
                             />
 
+                            {/* PRODUCTION BLUEPRINT SECTION */}
+                            <div style={{ marginBottom: '24px', background: 'rgba(0,0,0,0.2)', padding: '20px', borderRadius: '12px', border: '1px solid var(--stroke)' }}>
+                                <h4 style={{ fontSize: '16px', marginBottom: '16px', color: 'var(--accent2)' }}>Production Blueprint</h4>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                    {(() => {
+                                        let elements = [];
+                                        try {
+                                            const parsed = JSON.parse(selectedDesign.designJSON);
+                                            elements = parsed.elements || [];
+                                        } catch (e) { console.error("Could not parse design JSON", e) }
+
+                                        if (elements.length === 0) {
+                                            return <p style={{ color: 'var(--muted)', fontSize: '13px' }}>No editable layers found in this design.</p>;
+                                        }
+
+                                        return elements.map((el, i) => (
+                                            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '16px', background: 'rgba(255,255,255,0.03)', padding: '12px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                                                {el.type === 'image' ? (
+                                                    <div style={{ width: '48px', height: '48px', borderRadius: '8px', background: 'var(--bg2)', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                        <img src={el.src} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="Element" />
+                                                    </div>
+                                                ) : (
+                                                    <div style={{ width: '48px', height: '48px', borderRadius: '8px', background: 'rgba(79, 70, 229, 0.1)', color: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                        <Type size={24} />
+                                                    </div>
+                                                )}
+
+                                                <div style={{ flex: 1 }}>
+                                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                                                        <span style={{ fontSize: '14px', fontWeight: '500', textTransform: 'capitalize' }}>{el.type} Layer ({el.printArea})</span>
+                                                        {el.type === 'image' && (
+                                                            <span style={{ fontSize: '12px', color: el.dpi >= 300 ? '#22c55e' : '#fbbf24', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                                                {el.dpi >= 300 ? <CheckCircle2 size={12} /> : <AlertCircle size={12} />}
+                                                                {el.dpi} DPI
+                                                            </span>
+                                                        )}
+                                                    </div>
+
+                                                    {el.type === 'image' && (
+                                                        <p style={{ fontSize: '13px', color: 'var(--muted)' }}>Format: Raw • Source Size: {el.width}x{el.height}px</p>
+                                                    )}
+                                                    {el.type === 'text' && (
+                                                        <p style={{ fontSize: '13px', color: 'var(--muted)' }}>"{el.text}" • Font: {el.fontFamily} • Size: {el.fontSize}px</p>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        ));
+                                    })()}
+                                </div>
+                            </div>
+
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                                 <button
-                                    onClick={() => alert(`Initiating download of Backend-Rendered HD Print File for ${selectedDesign}...`)}
+                                    onClick={() => alert(`Initiating download of Backend-Rendered HD Print File for ${selectedDesign.id}...`)}
                                     className="navBtn"
                                     style={{ width: '100%', padding: '14px', fontSize: '14px', fontWeight: '500', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
                                 >
-                                    <Download size={18} /> Download Print-Ready File (High Res)
+                                    <Download size={18} /> Download HD Print-Ready File
                                 </button>
 
+
                                 <button
-                                    onClick={() => alert(`Initiating download of raw Master JSON data for ${selectedDesign}...`)}
+                                    onClick={() => alert(`Initiating download of raw Master JSON blueprint for ${selectedDesign.id}...`)}
                                     style={{
                                         width: '100%', padding: '14px', fontSize: '14px', fontWeight: '500',
                                         display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
@@ -309,10 +379,11 @@ const OrdersTable = ({ orders, updateStatus, getStatusColor, setSelectedDesign }
                     <td style={{ padding: '20px 16px', fontWeight: 'bold' }}>{order.id}</td>
                     <td style={{ padding: '20px 16px' }}>
                         <div
-                            onClick={() => setSelectedDesign(order.designUrl)}
+                            onClick={() => setSelectedDesign(order)}
                             style={{ width: '40px', height: '40px', borderRadius: '8px', overflow: 'hidden', cursor: 'pointer', border: '1px solid var(--stroke)', position: 'relative' }}
                         >
                             <img src={order.designUrl} alt="design" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+
                             <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0, transition: '0.2s' }} className="design-hover">
                                 <Eye size={16} color="white" />
                             </div>

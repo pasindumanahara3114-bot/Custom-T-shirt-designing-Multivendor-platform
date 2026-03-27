@@ -36,6 +36,7 @@ const mockProviders = [
 const ProductConfigPage = () => {
     const navigate = useNavigate();
     const location = useLocation();
+    const { designs } = location.state || { designs: null };
 
     const [material, setMaterial] = useState('cotton');
     const [quantity, setQuantity] = useState(10);
@@ -109,7 +110,7 @@ const ProductConfigPage = () => {
                         gap: '20px'
                     }}>
                         {filteredProviders.map(p => (
-                            <ProviderCard key={p.id} provider={p} config={{ material, quantity }} />
+                            <ProviderCard key={p.id} provider={p} config={{ material, quantity, designs }} />
                         ))}
                     </div>
                 </div>

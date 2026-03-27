@@ -49,7 +49,24 @@ const DesignPage = () => {
         </div>
 
         <div style={{ position: 'fixed', bottom: '20px', right: '20px' }}>
-          <button onClick={() => navigate('/config')} className="primaryBtn" style={{ padding: '12px 24px' }}>
+          <button
+            onClick={() => {
+              // Extract design summary for the order flow
+              const designSummary = {
+                frontPreview: designs.front || shirtColor, // Fallback to color if no design
+                backPreview: designs.back,
+                designJSON: JSON.stringify({
+                  elements: [
+                    { type: 'image', src: designs.front, printArea: 'Front', dpi: 300 },
+                    { type: 'text', text: 'Custom Text', fontFamily: 'Arial', fontSize: 24, printArea: 'Front' }
+                  ]
+                })
+              };
+              navigate('/config', { state: { designs: designSummary } });
+            }}
+            className="primaryBtn"
+            style={{ padding: '12px 24px' }}
+          >
             Next: Configure Product →
           </button>
         </div>
