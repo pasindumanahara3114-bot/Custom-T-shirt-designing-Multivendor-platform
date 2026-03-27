@@ -38,7 +38,6 @@ const ProductConfigPage = () => {
     const location = useLocation();
 
     const [material, setMaterial] = useState('cotton');
-    const [size, setSize] = useState('M');
     const [quantity, setQuantity] = useState(10);
 
     const filteredProviders = mockProviders.filter(p =>
@@ -65,17 +64,6 @@ const ProductConfigPage = () => {
                     >
                         <option value="cotton">Cotton</option>
                         <option value="polyester">Polyester</option>
-                    </select>
-                    <label style={{ marginTop: '16px' }}>Size</label>
-                    <select
-                        value={size}
-                        onChange={(e) => setSize(e.target.value)}
-                        className="field"
-                    >
-                        <option>S</option>
-                        <option>M</option>
-                        <option>L</option>
-                        <option>XL</option>
                     </select>
                     <label style={{ marginTop: '16px' }}>Quantity</label>
                     <input

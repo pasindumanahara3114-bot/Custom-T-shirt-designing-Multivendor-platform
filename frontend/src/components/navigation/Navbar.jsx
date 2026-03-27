@@ -1,4 +1,4 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../../context/ThemeContext';
 import { Sun, Moon } from 'lucide-react';
 
@@ -10,11 +10,6 @@ const Navbar = () => {
     <div className="navbar">
       <h2 className="logo">PrintHub</h2>
 
-      <div className="navLinks">
-        <Link to="/">Home</Link>
-        <Link to="/design">Design</Link>
-        <Link to="/providers">Vendors</Link>
-      </div>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
         <div className="theme-toggle" onClick={toggleTheme} title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}>
@@ -27,12 +22,6 @@ const Navbar = () => {
           </div>
         </div>
 
-        <button className="secondaryBtn" style={{ padding: '8px 16px' }} onClick={() => navigate('/login')}>
-          Login
-        </button>
-        <button className="navBtn" style={{ padding: '8px 16px' }} onClick={() => navigate('/signup')}>
-          Sign Up
-        </button>
       </div>
     </div>
   );

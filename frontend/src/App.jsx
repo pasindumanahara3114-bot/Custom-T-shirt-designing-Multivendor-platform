@@ -9,6 +9,7 @@ import ProviderPage from './pages/Provider/ProviderPage';
 import ProviderDashboard from './pages/Provider/ProviderDashboard';
 import SignupPage from './pages/Signup/SignupPage';
 import LoginPage from './pages/Login/LoginPage';
+import CustomerDashboard from './pages/Customer/CustomerDashboard';
 import AdminDashboard from './pages/Admin/AdminDashboard';
 import { ThemeProvider } from './context/ThemeContext';
 
@@ -23,6 +24,7 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
 
           {/* Customer Routes */}
+          <Route path="/dashboard" element={<CustomerDashboard />} />
           <Route path="/design" element={<DesignPage />} />
           <Route path="/config" element={<ProductConfigPage />} />
           <Route path="/providers" element={<ProviderPage />} />
