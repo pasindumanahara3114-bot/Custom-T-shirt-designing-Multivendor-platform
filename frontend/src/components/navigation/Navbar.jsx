@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { useTheme } from '../context/ThemeContext';
+import { useTheme } from '../../context/ThemeContext';
 import { Sun, Moon } from 'lucide-react';
 
 const Navbar = () => {
@@ -13,6 +13,7 @@ const Navbar = () => {
       <div className="navLinks">
         <Link to="/">Home</Link>
         <Link to="/design">Design</Link>
+        <Link to="/providers">Vendors</Link>
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
@@ -26,8 +27,11 @@ const Navbar = () => {
           </div>
         </div>
 
-        <button className="navBtn" onClick={() => navigate('/design')}>
-          Start
+        <button className="secondaryBtn" style={{ padding: '8px 16px' }} onClick={() => navigate('/login')}>
+          Login
+        </button>
+        <button className="navBtn" style={{ padding: '8px 16px' }} onClick={() => navigate('/signup')}>
+          Sign Up
         </button>
       </div>
     </div>
