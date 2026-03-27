@@ -33,4 +33,10 @@ public class VendorService {
         return vendorProfileRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Vendor not found"));
     }
+
+    public List<VendorProfile> getEligibleVendors(String material, Integer quantity) {
+        // In a real scenario, this would involve complex filtering logic.
+        // For now, we return all vendors to verify connectivity.
+        return vendorProfileRepository.findAll();
+    }
 }
