@@ -3,20 +3,21 @@ import React from 'react';
 const ProviderCard = ({ provider }) => {
     return (
         <div style={{
-            background: '#020617',
+            background: 'var(--card)',
             padding: '20px',
             borderRadius: '16px',
             boxShadow: '0 10px 25px rgba(0,0,0,0.4)',
+            border: '1px solid var(--stroke)',
             transition: '0.3s'
         }}>
-            <h3>{provider.name}</h3>
+            <h3 style={{ color: 'var(--text)' }}>{provider.name}</h3>
 
-            <p style={{ color: '#94a3b8' }}>
+            <p style={{ color: 'var(--muted)' }}>
                 Materials: {provider.materials.join(', ')}
             </p>
 
-            <p>💰 Rs. {provider.price}</p>
-            <p>⭐ {provider.rating}</p>
+            <p style={{ color: 'var(--text)' }}>💰 Rs. {provider.price}</p>
+            <p style={{ color: 'var(--text)' }}>⭐ {provider.rating}</p>
 
             <button style={{
                 marginTop: '10px',
@@ -24,9 +25,10 @@ const ProviderCard = ({ provider }) => {
                 padding: '10px',
                 borderRadius: '10px',
                 border: 'none',
-                background: '#6366f1',
-                color: '#fff',
-                cursor: 'pointer'
+                background: 'var(--accent)',
+                color: 'white',
+                cursor: 'pointer',
+                fontWeight: '600'
             }}>
                 Select Provider
             </button>

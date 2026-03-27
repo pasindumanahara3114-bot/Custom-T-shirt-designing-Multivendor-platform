@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTheme } from '../../context/ThemeContext';
+import { Sun, Moon } from 'lucide-react';
 
 const Topbar = ({ side, shirtStyle }) => {
     const { theme, toggleTheme } = useTheme();
@@ -16,8 +17,12 @@ const Topbar = ({ side, shirtStyle }) => {
 
             <div className="badges" style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
                 <div className="theme-toggle" onClick={toggleTheme} title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}>
+                    <div className="theme-toggle-icons">
+                        <Moon size={14} />
+                        <Sun size={14} />
+                    </div>
                     <div className="theme-toggle-thumb">
-                        {theme === 'light' ? '☀️' : '🌙'}
+                        {theme === 'light' ? <Sun size={14} /> : <Moon size={14} />}
                     </div>
                 </div>
 

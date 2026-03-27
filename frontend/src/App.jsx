@@ -9,7 +9,6 @@ import ProviderDashboard from './pages/ProviderDashboard';
 import { ThemeProvider } from './context/ThemeContext';
 
 function App() {
-  console.log("React App Starting...");
   return (
     <ThemeProvider>
       <Router>
