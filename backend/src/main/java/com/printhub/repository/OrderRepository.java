@@ -1,3 +1,9 @@
+/**
+ * OrderRepository - Data access for custom production orders.
+ */
+/**
+ * OrderRepository - Data access interface for production order persistence.
+ */
 package com.printhub.repository;
 
 import com.printhub.model.Order;
