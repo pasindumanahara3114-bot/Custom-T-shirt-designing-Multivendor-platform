@@ -4,6 +4,7 @@
  */
 package com.printhub.controller;
 
+import com.printhub.dto.VendorDTO;
 import com.printhub.model.VendorProfile;
 import com.printhub.service.VendorService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,9 +21,8 @@ public class VendorController {
     private VendorService vendorService;
 
     /**
-     * Retrieves a list of all active printing vendors.
-     * 
-     * @return List of vendor profiles.
+     * Retrieves a list of all active printing vendors (raw entities, for admin
+     * use).
      */
     @GetMapping
     public ResponseEntity<List<VendorProfile>> getAllVendors() {
@@ -34,8 +34,12 @@ public class VendorController {
         return ResponseEntity.ok(vendorService.getVendorById(id));
     }
 
+    /**
+     * Returns eligible vendors filtered by material and quantity.
+     * Returns VendorDTO (safe — no password/user fields).
+     */
     @GetMapping("/eligible")
-    public ResponseEntity<List<VendorProfile>> getEligibleVendors(
+    public ResponseEntity<List<VendorDTO>> getEligibleVendors(
             @RequestParam String material,
             @RequestParam Integer quantity) {
         return ResponseEntity.ok(vendorService.getEligibleVendors(material, quantity));
@@ -43,9 +47,6 @@ public class VendorController {
 
     /**
      * Updates a vendor's business profile (Pricing, Capacity, Materials).
-     * 
-     * @param profile The updated profile data.
-     * @return The persisted profile.
      */
     @PutMapping("/profile")
     public ResponseEntity<VendorProfile> updateProfile(@RequestBody VendorProfile profile) {

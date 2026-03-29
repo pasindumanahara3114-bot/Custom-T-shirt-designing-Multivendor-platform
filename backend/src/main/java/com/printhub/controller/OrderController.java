@@ -75,16 +75,33 @@ public class OrderController {
     }
 
     @GetMapping("/{id}/hd-preview")
-    public ResponseEntity<byte[]> downloadHDPreview(@PathVariable String id) {
+    public ResponseEntity<Object> downloadHDPreview(@PathVariable String id) {
         OrderDTO order = orderService.getAllOrders().stream()
                 .filter(o -> o.getId().equals(id))
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("Order not found"));
 
-        // Redirecting or serving the original design URL
-        // If it's a data URL (base64) from fabric.js, we should handle it
+        String designUrl = order.getDesignUrl();
+
+        if (designUrl != null && designUrl.startsWith("data:image")) {
+            try {
+                // Parse base64
+                String base64Image = designUrl.split(",")[1];
+                byte[] imageBytes = java.util.Base64.getDecoder().decode(base64Image);
+                String contentType = designUrl.split(":")[1].split(";")[0];
+
+                return ResponseEntity.ok()
+                        .header("Content-Type", contentType)
+                        .header("Content-Disposition", "inline; filename=\"" + id + "-preview.png\"")
+                        .body(imageBytes);
+            } catch (Exception e) {
+                return ResponseEntity.internalServerError().build();
+            }
+        }
+
+        // Fallback to redirect if it's a remote URL
         return ResponseEntity.status(302)
-                .header("Location", order.getDesignUrl())
+                .header("Location", designUrl)
                 .build();
     }
 }
