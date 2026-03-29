@@ -11,7 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * UserService - Handles core identity logic and user-to-DTO transformations.
@@ -124,5 +126,23 @@ public class UserService {
 
     private UserDTO mapToDTOWithComplete(User user, boolean isComplete) {
         return new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getRole(), isComplete);
+    }
+
+    public List<UserDTO> getAllUsers() {
+        return userRepository.findAll().stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
+    public void deleteUser(Long id) {
+        if (!userRepository.existsById(id)) {
+            throw new RuntimeException("User not found with id: " + id);
+        }
+        // Need to delete vendor profile first if it exists due to constraints
+        User user = userRepository.findById(id).orElseThrow();
+        if (user.getRole() == User.Role.PROVIDER) {
+            vendorProfileRepository.findByUser(user).ifPresent(profile -> vendorProfileRepository.delete(profile));
+        }
+        userRepository.deleteById(id);
     }
 }

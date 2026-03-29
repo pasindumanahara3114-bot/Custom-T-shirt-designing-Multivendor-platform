@@ -169,4 +169,28 @@ public class OrderService {
                                 order.getCustomer() != null ? order.getCustomer().getName() : "Anonymous",
                                 order.getAddress());
         }
+
+        /**
+         * System-wide statistics for the Admin Dashboard.
+         */
+        public java.util.Map<String, Object> getPlatformStats() {
+                long totalUsers = userRepository.count();
+                long totalVendors = vendorRepository.count();
+                
+                List<Order> allOrders = orderRepository.findAll();
+                long totalOrders = allOrders.size();
+                
+                double globalRevenue = allOrders.stream()
+                                .filter(o -> o.getStatus() == Order.OrderStatus.READY_FOR_DELIVERY)
+                                .mapToDouble(o -> o.getTotalPrice() != null ? o.getTotalPrice() : 0.0)
+                                .sum();
+
+                java.util.Map<String, Object> stats = new java.util.HashMap<>();
+                stats.put("totalUsers", totalUsers);
+                stats.put("totalVendors", totalVendors);
+                stats.put("totalOrders", totalOrders);
+                stats.put("globalRevenue", globalRevenue);
+                
+                return stats;
+        }
 }
