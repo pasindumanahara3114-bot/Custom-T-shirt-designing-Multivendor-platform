@@ -54,10 +54,12 @@ const SignupPage = () => {
             login(user); // Auto-login
             alert(`Welcome, ${formData.name}! Your account has been created.`);
 
-            // Customers go straight to dashboard, Providers go to setup
+            // Route based on role
             const roleStr = user.role?.toUpperCase() || role.toUpperCase();
             if (roleStr === 'PROVIDER' || roleStr === 'VENDOR') {
                 navigate('/complete-profile');
+            } else if (roleStr === 'ADMIN') {
+                navigate('/admin');
             } else {
                 navigate('/dashboard');
             }

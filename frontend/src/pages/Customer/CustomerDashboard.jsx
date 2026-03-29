@@ -4,6 +4,7 @@ import { Plus, ShoppingBag, Heart, Clock, ChevronRight, Sun, Moon, LogOut, User,
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
 import { orderService, designService } from '../../api';
+import CustomerOrderModal from '../../components/shared/CustomerOrderModal.jsx';
 
 const CustomerDashboard = () => {
     const navigate = useNavigate();
@@ -14,6 +15,7 @@ const CustomerDashboard = () => {
     const [savedDesigns, setSavedDesigns] = useState([]);
     const [recentlyViewed, setRecentlyViewed] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [selectedOrder, setSelectedOrder] = useState(null);
 
     const formatStatus = (status) => {
         if (!status) return 'N/A';
@@ -39,7 +41,8 @@ const CustomerDashboard = () => {
                     status: formatStatus(o.status),
                     price: `Rs. ${o.totalPrice.toLocaleString()}`,
                     items: o.quantity,
-                    image: o.designUrl || '/design/hero-shirt.png'
+                    image: o.designUrl || '/design/hero-shirt.png',
+                    raw: o // Keep the raw backend object for the modal
                 }));
                 setRecentOrders(mappedOrders);
 
@@ -156,7 +159,12 @@ const CustomerDashboard = () => {
                                     <span className="see-all">See All History</span>
                                 </div>
                                 {recentOrders.map(order => (
-                                    <div key={order.id} className="order-card-v2 glass">
+                                    <div 
+                                        key={order.id} 
+                                        className="order-card-v2 glass"
+                                        onClick={() => setSelectedOrder(order)}
+                                        style={{ cursor: 'pointer', transition: 'transform 0.2s', ':hover': { transform: 'scale(1.02)' } }}
+                                    >
                                         <div className="order-img">
                                             <img src={order.image} alt={order.id} />
                                         </div>
@@ -174,7 +182,14 @@ const CustomerDashboard = () => {
                                             <div className="order-row-bottom">
                                                 <span className="order-price">{order.price}</span>
                                                 <div style={{ display: 'flex', gap: '8px' }}>
-                                                    <button onClick={() => orderService.downloadBlueprint(order.id)} className="track-btn" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid var(--stroke)' }}>
+                                                    <button 
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            orderService.downloadBlueprint(order.id);
+                                                        }} 
+                                                        className="track-btn" 
+                                                        style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid var(--stroke)', position: 'relative', zIndex: 10 }}
+                                                    >
                                                         <Download size={14} />
                                                     </button>
                                                     <button className="track-btn">Track Order</button>
@@ -242,6 +257,13 @@ const CustomerDashboard = () => {
                     </div>
                 </section>
             </div>
+
+            {selectedOrder && (
+                <CustomerOrderModal 
+                    order={selectedOrder} 
+                    onClose={() => setSelectedOrder(null)} 
+                />
+            )}
         </div>
     );
 };

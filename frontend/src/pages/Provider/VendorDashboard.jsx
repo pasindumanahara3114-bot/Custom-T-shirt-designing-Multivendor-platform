@@ -354,12 +354,12 @@ const VendorDashboard = () => {
                                         <div style={{ width: '44px', height: '44px', borderRadius: '12px', background: 'linear-gradient(135deg, #4f46e5, #10b981)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                             <DollarSign size={22} color="white" />
                                         </div>
-                                        <span style={{ color: 'var(--muted)', fontSize: '13px', fontWeight: '500' }}>Total Earned</span>
+                                        <span style={{ color: 'var(--muted)', fontSize: '13px', fontWeight: '500' }}>Your Net Profit</span>
                                     </div>
                                     <div style={{ fontSize: '28px', fontWeight: '700', color: '#10b981' }}>
                                         Rs. {(earnings.totalEarnings || 0).toLocaleString()}
                                     </div>
-                                    <div style={{ fontSize: '12px', color: 'var(--muted)', marginTop: '6px' }}>From {earnings.completedOrders || 0} delivered orders</div>
+                                    <div style={{ fontSize: '12px', color: 'var(--muted)', marginTop: '6px' }}>From {earnings.completedOrders || 0} delivered orders (After Platform Fee)</div>
                                 </div>
 
                                 {/* Pending Earnings */}
@@ -368,12 +368,12 @@ const VendorDashboard = () => {
                                         <div style={{ width: '44px', height: '44px', borderRadius: '12px', background: 'linear-gradient(135deg, #f59e0b, #ef4444)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                             <Clock size={22} color="white" />
                                         </div>
-                                        <span style={{ color: 'var(--muted)', fontSize: '13px', fontWeight: '500' }}>Pending Earnings</span>
+                                        <span style={{ color: 'var(--muted)', fontSize: '13px', fontWeight: '500' }}>Pending Profit</span>
                                     </div>
                                     <div style={{ fontSize: '28px', fontWeight: '700', color: '#f59e0b' }}>
                                         Rs. {(earnings.pendingEarnings || 0).toLocaleString()}
                                     </div>
-                                    <div style={{ fontSize: '12px', color: 'var(--muted)', marginTop: '6px' }}>Orders in progress</div>
+                                    <div style={{ fontSize: '12px', color: 'var(--muted)', marginTop: '6px' }}>Orders in progress (After Platform Fee)</div>
                                 </div>
 
                                 {/* Total Orders */}

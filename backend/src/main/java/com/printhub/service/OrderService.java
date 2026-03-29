@@ -32,6 +32,9 @@ public class OrderService {
         @Autowired
         private VendorProfileRepository vendorRepository;
 
+        @Autowired
+        private AppConfigService appConfigService;
+
         /**
          * Persists a new order along with its associated design metadata.
          */
@@ -115,24 +118,32 @@ public class OrderService {
                                 .filter(o -> o.getVendor() != null && o.getVendor().getId().equals(vendorId))
                                 .collect(Collectors.toList());
 
-                double totalEarnings = vendorOrders.stream()
+                // The configured percentage is the Admin's Platform Fee (e.g., 2.0%)
+                double adminFeePercentage = appConfigService.getConfig().getVendorProfitPercentage() / 100.0;
+                double vendorShareMultiplier = 1.0 - adminFeePercentage;
+
+                double totalGrossEarnings = vendorOrders.stream()
                                 .filter(o -> o.getStatus() == Order.OrderStatus.READY_FOR_DELIVERY)
                                 .mapToDouble(o -> o.getTotalPrice() != null ? o.getTotalPrice() : 0.0)
                                 .sum();
+                
+                double totalVendorEarnings = totalGrossEarnings * vendorShareMultiplier;
 
-                double pendingEarnings = vendorOrders.stream()
+                double pendingGrossEarnings = vendorOrders.stream()
                                 .filter(o -> o.getStatus() == Order.OrderStatus.ACCEPTED
                                                 || o.getStatus() == Order.OrderStatus.IN_PRODUCTION)
                                 .mapToDouble(o -> o.getTotalPrice() != null ? o.getTotalPrice() : 0.0)
                                 .sum();
+                                
+                double pendingVendorEarnings = pendingGrossEarnings * vendorShareMultiplier;
 
                 long completedCount = vendorOrders.stream()
                                 .filter(o -> o.getStatus() == Order.OrderStatus.READY_FOR_DELIVERY)
                                 .count();
 
                 java.util.Map<String, Object> result = new java.util.HashMap<>();
-                result.put("totalEarnings", totalEarnings);
-                result.put("pendingEarnings", pendingEarnings);
+                result.put("totalEarnings", totalVendorEarnings);
+                result.put("pendingEarnings", pendingVendorEarnings);
                 result.put("completedOrders", completedCount);
                 result.put("totalOrders", (long) vendorOrders.size());
                 return result;
@@ -167,6 +178,7 @@ public class OrderService {
                                 order.getDesignJson(),
                                 order.getTotalPrice(),
                                 order.getCustomer() != null ? order.getCustomer().getName() : "Anonymous",
+                                order.getVendor() != null ? order.getVendor().getBusinessName() : "Unknown Vendor",
                                 order.getAddress());
         }
 
@@ -185,11 +197,18 @@ public class OrderService {
                                 .mapToDouble(o -> o.getTotalPrice() != null ? o.getTotalPrice() : 0.0)
                                 .sum();
 
+                // Calculate splits: the configured percentage is the Admin's cut
+                double adminFeePercentage = appConfigService.getConfig().getVendorProfitPercentage() / 100.0;
+                double platformProfit = globalRevenue * adminFeePercentage;
+                double vendorPayouts = globalRevenue - platformProfit;
+
                 java.util.Map<String, Object> stats = new java.util.HashMap<>();
                 stats.put("totalUsers", totalUsers);
                 stats.put("totalVendors", totalVendors);
                 stats.put("totalOrders", totalOrders);
                 stats.put("globalRevenue", globalRevenue);
+                stats.put("vendorPayouts", vendorPayouts);
+                stats.put("platformProfit", platformProfit);
                 
                 return stats;
         }

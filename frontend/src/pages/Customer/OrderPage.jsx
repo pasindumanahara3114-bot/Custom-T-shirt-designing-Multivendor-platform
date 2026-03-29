@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { ChevronLeft, Upload, Package, Calendar, User, Mail, Layers, Ruler, MapPin } from 'lucide-react';
 import { orderService } from '../../api';
 import MainLayout from '../../layouts/MainLayout.jsx';
+import PaymentModal from '../../components/shared/PaymentModal.jsx';
 
 const OrderPage = () => {
     const location = useLocation();
@@ -12,6 +13,7 @@ const OrderPage = () => {
 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const [showPayment, setShowPayment] = useState(false);
 
     const [formData, setFormData] = useState({
         name: '',
@@ -48,6 +50,34 @@ const OrderPage = () => {
         setLoading(true);
 
         try {
+            const orderPayload = {
+                name: formData.name,
+                email: formData.email,
+                material: formData.material,
+                quantity: formData.quantity,
+                size: formData.size,
+                designUrl: previewImage,
+                designJson: designJSON,
+                vendorId: provider.id,
+                address: formData.address,
+                status: 'PLACED'
+            };
+
+            // Trigger payment modal instead of placing order immediately
+            setShowPayment(true);
+        } catch (err) {
+            console.error("Order setup failed:", err);
+            setError('Failed to setup order.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const executeRealOrder = async () => {
+        try {
+            setShowPayment(false);
+            setLoading(true);
+
             const orderPayload = {
                 name: formData.name,
                 email: formData.email,
@@ -201,9 +231,9 @@ const OrderPage = () => {
                             type="submit"
                             className="navBtn"
                             style={{ width: '100%', padding: '16px', marginTop: '10px' }}
-                            disabled={loading}
+                            disabled={loading || showPayment}
                         >
-                            {loading ? 'Placing Order...' : `Place Order with ${provider.name}`}
+                            {loading ? 'Setting up order...' : `Proceed to Payment`}
                         </button>
                     </form>
 
@@ -301,6 +331,14 @@ const OrderPage = () => {
                         gap: 8px;
                     }
                 `}</style>
+
+                {showPayment && (
+                    <PaymentModal 
+                        amount={(provider.price || 1200) * formData.quantity} 
+                        onPaymentSuccess={executeRealOrder}
+                        onCancel={() => setShowPayment(false)}
+                    />
+                )}
             </div>
         </MainLayout>
     );

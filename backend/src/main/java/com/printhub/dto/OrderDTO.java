@@ -31,5 +31,6 @@ public class OrderDTO {
     private String designJson;
     private Double totalPrice;
     private String customerName;
+    private String vendorName;
     private String address;
 }

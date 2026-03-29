@@ -26,10 +26,16 @@ const AdminDashboard = () => {
     const navigate = useNavigate();
 
     const [activeTab, setActiveTab] = useState('overview');
+    const [roleFilter, setRoleFilter] = useState('ALL');
     const [loading, setLoading] = useState(true);
-    const [stats, setStats] = useState({ totalUsers: 0, totalVendors: 0, totalOrders: 0, globalRevenue: 0 });
+    const [stats, setStats] = useState({ totalUsers: 0, totalVendors: 0, totalOrders: 0, globalRevenue: 0, vendorPayouts: 0, platformProfit: 0 });
     const [users, setUsers] = useState([]);
     const [orders, setOrders] = useState([]);
+    
+    // Configurations state
+    const [config, setConfig] = useState(null);
+    const [newPercentage, setNewPercentage] = useState('');
+    const [savingConfig, setSavingConfig] = useState(false);
 
     useEffect(() => {
         loadData();
@@ -38,14 +44,17 @@ const AdminDashboard = () => {
     const loadData = async () => {
         setLoading(true);
         try {
-            const [statsData, usersData, ordersData] = await Promise.all([
+            const [statsData, usersData, ordersData, configData] = await Promise.all([
                 adminService.getPlatformStats(),
                 adminService.getAllUsers(),
-                adminService.getAllOrders()
+                adminService.getAllOrders(),
+                adminService.getAppConfig()
             ]);
             setStats(statsData);
             setUsers(usersData);
             setOrders(ordersData);
+            setConfig(configData);
+            setNewPercentage(configData?.vendorProfitPercentage || '');
         } catch (err) {
             console.error("Failed to load admin data:", err);
         } finally {
@@ -69,6 +78,27 @@ const AdminDashboard = () => {
         } catch (err) {
             console.error("Failed to delete user:", err);
             alert("Failed to delete user.");
+        }
+    };
+
+    const handleSaveConfig = async () => {
+        setSavingConfig(true);
+        try {
+            const val = parseFloat(newPercentage);
+            if(isNaN(val) || val < 0 || val > 100) {
+                alert("Please enter a valid percentage between 0 and 100.");
+                return;
+            }
+            const updated = await adminService.updateAppConfig(val);
+            setConfig(updated);
+            alert("Settings saved successfully!");
+            // Reload stats to reflect new math
+            const newStats = await adminService.getPlatformStats();
+            setStats(newStats);
+        } catch(err) {
+            alert("Failed to save configuration.");
+        } finally {
+            setSavingConfig(false);
         }
     };
 
@@ -229,6 +259,28 @@ const AdminDashboard = () => {
                                     <div style={{ fontSize: '28px', fontWeight: '700' }}>{stats.totalOrders}</div>
                                 </div>
                             </div>
+                            
+                            {/* REVENUE BREAKDOWN */}
+                            <div className="glass" style={{ padding: '32px', borderRadius: '16px', display: 'flex', gap: '32px' }}>
+                                <div style={{ flex: 1 }}>
+                                    <h3 style={{ fontSize: '16px', fontWeight: '600', color: 'var(--muted)', marginBottom: '8px' }}>Total Gross Revenue</h3>
+                                    <div style={{ fontSize: '32px', fontWeight: '700', marginBottom: '8px' }}>Rs. {(stats.globalRevenue || 0).toLocaleString()}</div>
+                                    <div style={{ fontSize: '13px', color: 'var(--muted)' }}>Total value of all items ordered across the entire platform.</div>
+                                </div>
+                                <div style={{ width: '1px', background: 'var(--stroke)' }}></div>
+                                <div style={{ flex: 1 }}>
+                                    <h3 style={{ fontSize: '16px', fontWeight: '600', color: 'var(--muted)', marginBottom: '8px' }}>Vendor Payouts ({(100 - (config?.vendorProfitPercentage || 0))}%)</h3>
+                                    <div style={{ fontSize: '32px', fontWeight: '700', color: '#ec4899', marginBottom: '8px' }}>Rs. {(stats.vendorPayouts || 0).toLocaleString()}</div>
+                                    <div style={{ fontSize: '13px', color: 'var(--muted)' }}>Total earnings awarded to vendors for manufacturing/design.</div>
+                                </div>
+                                <div style={{ width: '1px', background: 'var(--stroke)' }}></div>
+                                <div style={{ flex: 1 }}>
+                                    <h3 style={{ fontSize: '16px', fontWeight: '600', color: 'var(--muted)', marginBottom: '8px' }}>Platform Profit ({(config?.vendorProfitPercentage || 0)}%)</h3>
+                                    <div style={{ fontSize: '32px', fontWeight: '700', color: '#10b981', marginBottom: '8px' }}>Rs. {(stats.platformProfit || 0).toLocaleString()}</div>
+                                    <div style={{ fontSize: '13px', color: 'var(--muted)' }}>Net profit kept by PrintHub admin ecosystem.</div>
+                                </div>
+                            </div>
+
                         </div>
                     )}
 
@@ -243,6 +295,31 @@ const AdminDashboard = () => {
                                 <span style={{ padding: '6px 16px', background: 'rgba(79,70,229,0.1)', color: 'var(--accent)', borderRadius: '20px', fontSize: '14px', fontWeight: '600' }}>{users.length} Total</span>
                             </div>
 
+                            {/* ROLE FILTERS */}
+                            <div style={{ display: 'flex', gap: '12px', marginBottom: '24px' }}>
+                                {['ALL', 'ADMIN', 'PROVIDER', 'CUSTOMER'].map(role => (
+                                    <button
+                                        key={role}
+                                        onClick={() => setRoleFilter(role)}
+                                        style={{
+                                            padding: '8px 16px',
+                                            borderRadius: '20px',
+                                            border: '1px solid',
+                                            borderColor: roleFilter === role ? 'transparent' : 'var(--stroke)',
+                                            background: roleFilter === role ? 'rgba(79,70,229,0.15)' : 'transparent',
+                                            color: roleFilter === role ? '#818cf8' : 'var(--muted)',
+                                            cursor: 'pointer',
+                                            fontSize: '13px',
+                                            fontWeight: '600',
+                                            transition: '0.2s',
+                                            textTransform: 'capitalize'
+                                        }}
+                                    >
+                                        {role === 'PROVIDER' ? 'Vendors' : role.toLowerCase()}
+                                    </button>
+                                ))}
+                            </div>
+
                             <div className="glass" style={{ borderRadius: '16px', overflow: 'hidden' }}>
                                 <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                                     <thead>
@@ -253,7 +330,7 @@ const AdminDashboard = () => {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {users.map((u, i) => (
+                                        {users.filter(u => roleFilter === 'ALL' || u.role === roleFilter).map((u, i) => (
                                             <tr key={u.id} style={{ borderBottom: '1px solid var(--stroke)', transition: '0.15s', background: i % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.01)' }}>
                                                 <td style={{ padding: '16px 20px', fontSize: '14px', color: 'var(--muted)' }}>#{u.id}</td>
                                                 <td style={{ padding: '16px 20px', fontSize: '14px', fontWeight: '500' }}>{u.name}</td>
@@ -337,11 +414,51 @@ const AdminDashboard = () => {
                         </div>
                     )}
 
-                    {/* SETTINGS BUBBLE */}
+                    {/* SETTINGS TAB */}
                     {activeTab === 'settings' && (
-                        <div style={{ padding: '40px', textAlign: 'center' }}>
-                            <Settings size={48} style={{ margin: '0 auto 20px', color: 'var(--muted)' }} />
-                            <h2 style={{ fontSize: '24px', fontWeight: '600', color: 'var(--muted)' }}>System Configurations Coming Soon</h2>
+                        <div style={{ animation: 'fadeIn 0.4s ease-out' }}>
+                            <div style={{ marginBottom: '28px' }}>
+                                <h1 style={{ fontSize: '28px', fontWeight: '700', marginBottom: '8px' }}>System Configurations</h1>
+                                <p style={{ color: 'var(--muted)', fontSize: '15px' }}>Manage platform-wide financial parameters.</p>
+                            </div>
+
+                            <div className="glass" style={{ padding: '32px', borderRadius: '16px', maxWidth: '600px' }}>
+                                <h3 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    <DollarSign size={20} color="#10b981" /> Platform Commission Fee
+                                </h3>
+                                <p style={{ fontSize: '14px', color: 'var(--muted)', marginBottom: '24px', lineHeight: '1.6' }}>
+                                    Set the global percentage of gross revenue that the Admin retains as a platform fee per order. The remainder is paid out to vendors for manufacturing.
+                                </p>
+
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '24px' }}>
+                                    <label style={{ fontSize: '13px', fontWeight: '600', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Platform Commission Fee (%)</label>
+                                    <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+                                        <input 
+                                            type="number" 
+                                            className="field" 
+                                            value={newPercentage} 
+                                            onChange={(e) => setNewPercentage(e.target.value)} 
+                                            min="0" max="100" step="0.1"
+                                            style={{ maxWidth: '150px', fontSize: '18px', fontWeight: '600' }}
+                                        />
+                                        <div style={{ flex: 1, height: '8px', background: 'var(--stroke)', borderRadius: '4px', position: 'relative', overflow: 'hidden' }}>
+                                            <div style={{ position: 'absolute', top: 0, left: 0, bottom: 0, width: `${Math.min(100, Math.max(0, newPercentage || 0))}%`, background: '#10b981', transition: 'width 0.3s' }}></div>
+                                        </div>
+                                    </div>
+                                    <div style={{ fontSize: '12px', color: 'var(--muted)', marginTop: '8px' }}>
+                                        Current Split: <span style={{ color: '#10b981', fontWeight: '600' }}>Admin keeps {newPercentage || 0}%</span> | <span style={{ color: '#ec4899', fontWeight: '600' }}>Vendor takes {100 - (newPercentage || 0)}%</span>
+                                    </div>
+                                </div>
+
+                                <button 
+                                    className="primaryBtn" 
+                                    onClick={handleSaveConfig} 
+                                    disabled={savingConfig}
+                                    style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
+                                >
+                                    <CheckCircle2 size={16} /> {savingConfig ? 'Saving...' : 'Apply Global Configuration'}
+                                </button>
+                            </div>
                         </div>
                     )}
                 </div>

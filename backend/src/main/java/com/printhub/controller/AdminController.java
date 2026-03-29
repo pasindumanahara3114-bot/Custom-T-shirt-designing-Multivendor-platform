@@ -2,6 +2,8 @@ package com.printhub.controller;
 
 import com.printhub.dto.OrderDTO;
 import com.printhub.dto.UserDTO;
+import com.printhub.model.AppConfig;
+import com.printhub.service.AppConfigService;
 import com.printhub.service.OrderService;
 import com.printhub.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +26,9 @@ public class AdminController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private AppConfigService appConfigService;
 
     /**
      * Retrieves system-wide aggregates: total users, vendors, orders, and global revenue.
@@ -57,4 +62,30 @@ public class AdminController {
     public ResponseEntity<List<OrderDTO>> getAllOrders() {
         return ResponseEntity.ok(orderService.getAllOrders());
     }
+
+    /**
+     * Retrieves the global application configuration.
+     */
+    @GetMapping("/config")
+    public ResponseEntity<AppConfig> getAppConfig() {
+        return ResponseEntity.ok(appConfigService.getConfig());
+    }
+
+    /**
+     * Updates the platform-wide vendor profit percentage.
+     */
+    @PutMapping("/config")
+    public ResponseEntity<?> updateAppConfig(@RequestBody Map<String, Double> payload) {
+        try {
+            Double percentage = payload.get("vendorProfitPercentage");
+            if (percentage == null) {
+                return ResponseEntity.badRequest().body(Map.of("message", "vendorProfitPercentage is required"));
+            }
+            AppConfig updatedConfig = appConfigService.updateVendorProfitPercentage(percentage);
+            return ResponseEntity.ok(updatedConfig);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        }
+    }
 }
+

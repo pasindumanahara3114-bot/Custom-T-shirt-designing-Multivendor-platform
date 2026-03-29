@@ -56,6 +56,35 @@ const adminService = {
             console.error("Fetch all orders admin error:", error);
             throw error;
         }
+    },
+
+    /**
+     * Retrieves the platform global settings including vendor profit margin.
+     * @returns {Promise<Object>} The AppConfig object.
+     */
+    getAppConfig: async () => {
+        try {
+            const response = await API.get("/admin/config");
+            return response.data;
+        } catch (error) {
+            console.error("Fetch app config error:", error);
+            throw error;
+        }
+    },
+
+    /**
+     * Updates the platform global settings.
+     * @param {number} percentage - The new vendor profit percentage (e.g., 2.0).
+     * @returns {Promise<Object>} The updated AppConfig object.
+     */
+    updateAppConfig: async (vendorProfitPercentage) => {
+        try {
+            const response = await API.put("/admin/config", { vendorProfitPercentage });
+            return response.data;
+        } catch (error) {
+            console.error("Update app config error:", error);
+            throw error;
+        }
     }
 };
 
