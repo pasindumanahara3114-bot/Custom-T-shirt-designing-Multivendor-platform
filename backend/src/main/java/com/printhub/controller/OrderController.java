@@ -39,6 +39,14 @@ public class OrderController {
         return ResponseEntity.ok(orderService.getOrdersByVendorId(vendorId));
     }
 
+    /**
+     * Returns earnings summary for a vendor (total, pending, completed count).
+     */
+    @GetMapping("/vendor/{vendorId}/earnings")
+    public ResponseEntity<java.util.Map<String, Object>> getVendorEarnings(@PathVariable Long vendorId) {
+        return ResponseEntity.ok(orderService.getVendorEarnings(vendorId));
+    }
+
     @GetMapping("/customer/{customerId}")
     public ResponseEntity<List<OrderDTO>> getCustomerOrders(@PathVariable Long customerId) {
         return ResponseEntity.ok(orderService.getOrdersByCustomerId(customerId));
@@ -58,6 +66,12 @@ public class OrderController {
             @PathVariable String id,
             @RequestParam OrderStatus status) {
         return ResponseEntity.ok(orderService.updateStatus(id, status));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteOrder(@PathVariable String id) {
+        orderService.deleteOrder(id);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{id}/blueprint")

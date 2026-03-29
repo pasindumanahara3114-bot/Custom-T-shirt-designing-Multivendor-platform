@@ -45,6 +45,37 @@ const authService = {
             throw error;
         }
     },
+    /**
+     * Completes customer profile setup.
+     * @param {number} userId - User ID.
+     * @param {Object} profileData - Profile details.
+     * @returns {Promise<Object>} Updated user data.
+     */
+    completeCustomerProfile: async (userId, profileData) => {
+        try {
+            const response = await API.post(`/auth/profile/customer/${userId}`, profileData);
+            return response.data;
+        } catch (error) {
+            console.error("Profile setup error:", error);
+            throw error;
+        }
+    },
+
+    /**
+     * Completes vendor profile setup.
+     * @param {number} userId - User ID.
+     * @param {Object} profileData - Profile details.
+     * @returns {Promise<Object>} Updated user data.
+     */
+    completeVendorProfile: async (userId, profileData) => {
+        try {
+            const response = await API.post(`/auth/profile/vendor/${userId}`, profileData);
+            return response.data;
+        } catch (error) {
+            console.error("Profile setup error:", error);
+            throw error;
+        }
+    },
 };
 
 export default authService;

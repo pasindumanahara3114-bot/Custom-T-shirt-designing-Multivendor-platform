@@ -31,6 +31,21 @@ const vendorService = {
     },
 
     /**
+     * Retrieves the vendor profile associated with a specific user account.
+     * @param {number|string} userId - User ID from AuthContext.
+     * @returns {Promise<Object>} Vendor profile data.
+     */
+    getVendorByUserId: async (userId) => {
+        try {
+            const response = await API.get(`/vendors/user/${userId}`);
+            return response.data;
+        } catch (error) {
+            console.error("Fetch vendor by userId error:", error);
+            throw error;
+        }
+    },
+
+    /**
      * Retrieves providers eligible for a specific material and quantity.
      * @param {string} material - Material name.
      * @param {number} quantity - Required quantity.

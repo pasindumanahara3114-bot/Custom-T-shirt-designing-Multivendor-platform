@@ -46,11 +46,14 @@ public class Order {
     @Column(name = "expected_date")
     private LocalDate expectedDate;
 
-    @Column(name = "design_url", columnDefinition = "TEXT")
+    @Column(name = "design_url", columnDefinition = "LONGTEXT")
     private String designUrl;
 
     @Column(name = "design_json", columnDefinition = "LONGTEXT")
     private String designJson;
+
+    @Column(columnDefinition = "TEXT")
+    private String address;
 
     @Column(name = "total_price", nullable = false)
     private Double totalPrice;

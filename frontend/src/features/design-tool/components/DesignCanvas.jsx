@@ -139,7 +139,7 @@ const DesignCanvas = ({
     // ✅ RESTORE DESIGN
     const restoreDesign = () => {
         const canvas = canvasInstance.current;
-        const json = designs?.[side];
+        const json = designs?.[`${side}JSON`];
 
         if (!json || !canvas) return;
 

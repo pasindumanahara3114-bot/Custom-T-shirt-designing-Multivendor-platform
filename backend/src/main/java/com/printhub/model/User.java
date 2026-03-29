@@ -31,6 +31,9 @@ public class User {
     @Column(nullable = false)
     private Role role;
 
+    @Column(name = "is_profile_complete", nullable = false)
+    private boolean profileComplete = false;
+
     public enum Role {
         CUSTOMER, PROVIDER, ADMIN
     }

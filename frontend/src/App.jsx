@@ -12,36 +12,42 @@ import LoginPage from './pages/Login/LoginPage';
 import CustomerDashboard from './pages/Customer/CustomerDashboard';
 import OrderPage from './pages/Customer/OrderPage';
 import AdminDashboard from './pages/Admin/AdminDashboard';
+import ProfileSetupPage from './pages/Profile/ProfileSetupPage';
+import ProtectedRoute from './components/auth/ProtectedRoute';
 import { ThemeProvider } from './context/ThemeContext';
+import { AuthProvider } from './context/AuthContext';
+import ErrorBoundary from './components/shared/ErrorBoundary';
 
 function App() {
   return (
-    <ThemeProvider>
-      <Router>
-        <Routes>
-          {/* Public / Shared Routes */}
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/signup" element={<SignupPage />} />
-          <Route path="/login" element={<LoginPage />} />
+    <ErrorBoundary>
+      <AuthProvider>
+        <ThemeProvider>
+          <Router>
+            <Routes>
+              {/* Public / Shared Routes */}
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/signup" element={<SignupPage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/complete-profile" element={<ProtectedRoute><ProfileSetupPage /></ProtectedRoute>} />
 
-          {/* Customer Routes */}
-          <Route path="/dashboard" element={<CustomerDashboard />} />
-          <Route path="/design" element={<DesignPage />} />
-          <Route path="/config" element={<ProductConfigPage />} />
-          <Route path="/order" element={<OrderPage />} />
-          <Route path="/providers" element={<ProviderPage />} />
+              {/* Customer Routes */}
+              <Route path="/dashboard" element={<ProtectedRoute><CustomerDashboard /></ProtectedRoute>} />
+              <Route path="/design" element={<ProtectedRoute><DesignPage /></ProtectedRoute>} />
+              <Route path="/config" element={<ProtectedRoute><ProductConfigPage /></ProtectedRoute>} />
+              <Route path="/order" element={<ProtectedRoute><OrderPage /></ProtectedRoute>} />
+              <Route path="/providers" element={<ProtectedRoute><ProviderPage /></ProtectedRoute>} />
 
+              {/* Provider Routes */}
+              <Route path="/vendor/dashboard" element={<ProtectedRoute><VendorDashboard /></ProtectedRoute>} />
 
-
-          {/* Provider Routes */}
-          <Route path="/provider/dashboard" element={<VendorDashboard />} />
-          <Route path="/providers" element={<ProviderPage />} />
-
-          {/* Admin Routes */}
-          <Route path="/admin" element={<AdminDashboard />} />
-        </Routes>
-      </Router>
-    </ThemeProvider>
+              {/* Admin Routes */}
+              <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+            </Routes>
+          </Router>
+        </ThemeProvider>
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }
 

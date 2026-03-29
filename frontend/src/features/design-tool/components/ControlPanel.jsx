@@ -56,8 +56,9 @@ const ControlPanel = ({
                     responseType: 'blob'
                 });
 
-                const imageURL = URL.createObjectURL(response.data);
-                addImgToCanvas(imageURL);
+                const reader = new FileReader();
+                reader.onload = (event) => addImgToCanvas(event.target.result);
+                reader.readAsDataURL(response.data);
             } catch (err) {
                 alert("AI Background Removal failed: " + err.message);
             }
@@ -106,7 +107,17 @@ const ControlPanel = ({
         // Save current
         const designObjs = canvas.getObjects().filter(o => o.selectable !== false);
         const json = JSON.stringify(designObjs.map(o => o.toObject()));
-        setDesigns(prev => ({ ...prev, [side]: json }));
+
+        // Also get preview
+        canvas.discardActiveObject();
+        canvas.renderAll();
+        const preview = canvas.toDataURL({ format: 'png', quality: 1.0 });
+
+        setDesigns(prev => ({
+            ...prev,
+            [`${side}JSON`]: json,
+            [`${side}Preview`]: preview
+        }));
 
         setSide(newSide);
     };

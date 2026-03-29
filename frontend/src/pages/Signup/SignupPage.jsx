@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { Building2, ChevronDown, ShieldCheck, User } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { authService } from '../../api';
+import { useAuth } from '../../context/AuthContext';
 import MainLayout from '../../layouts/MainLayout.jsx';
 
 const SignupPage = () => {
     const navigate = useNavigate();
+    const { login } = useAuth();
     const [role, setRole] = useState('customer');
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -48,9 +50,17 @@ const SignupPage = () => {
                 role: role.toUpperCase()
             };
 
-            await authService.signup(signupData);
+            const user = await authService.signup(signupData);
+            login(user); // Auto-login
             alert(`Welcome, ${formData.name}! Your account has been created.`);
-            navigate('/login');
+
+            // Customers go straight to dashboard, Providers go to setup
+            const roleStr = user.role?.toUpperCase() || role.toUpperCase();
+            if (roleStr === 'PROVIDER' || roleStr === 'VENDOR') {
+                navigate('/complete-profile');
+            } else {
+                navigate('/dashboard');
+            }
         } catch (err) {
             console.error("Signup failed:", err);
             setError(err.response?.data?.message || 'Failed to create account. Please try again.');

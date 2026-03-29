@@ -38,10 +38,16 @@ public class OrderService {
         public OrderDTO placeOrder(OrderRequestDTO request) {
                 Order order = new Order();
 
-                // Find Customer by email
+                // Find or auto-create Customer by email (supports guest checkout)
                 com.printhub.model.User customer = userRepository.findByEmail(request.getEmail())
-                                .orElseThrow(() -> new RuntimeException(
-                                                "Customer not found with email: " + request.getEmail()));
+                                .orElseGet(() -> {
+                                        com.printhub.model.User guest = new com.printhub.model.User();
+                                        guest.setName(request.getName() != null ? request.getName() : "Guest");
+                                        guest.setEmail(request.getEmail());
+                                        guest.setPassword("guest_" + System.currentTimeMillis()); // placeholder
+                                        guest.setRole(com.printhub.model.User.Role.CUSTOMER);
+                                        return userRepository.save(guest);
+                                });
 
                 // Find Vendor by ID
                 com.printhub.model.VendorProfile vendor = vendorRepository.findById(request.getVendorId())
@@ -61,10 +67,11 @@ public class OrderService {
                 order.setDesignJson(request.getDesignJson());
                 order.setExpectedDate(request.getExpectedDate() != null ? request.getExpectedDate()
                                 : LocalDate.now().plusDays(7));
+                order.setAddress(request.getAddress());
                 order.setStatus(Order.OrderStatus.PLACED);
                 order.setOrderDate(java.time.LocalDateTime.now());
 
-                // Calculate total price (Simplified: vendor pricePerUnit * quantity)
+                // Calculate total price
                 double unitPrice = vendor.getPricePerUnit() != null ? vendor.getPricePerUnit() : 1200.0;
                 order.setTotalPrice(unitPrice * request.getQuantity());
 
@@ -98,11 +105,51 @@ public class OrderService {
                                 .collect(Collectors.toList());
         }
 
+        /**
+         * Calculates total earnings for a vendor.
+         * Counts all orders (completed ones contribute to earnings).
+         * Returns a summary map with totalEarnings and completedOrders.
+         */
+        public java.util.Map<String, Object> getVendorEarnings(Long vendorId) {
+                List<Order> vendorOrders = orderRepository.findAll().stream()
+                                .filter(o -> o.getVendor() != null && o.getVendor().getId().equals(vendorId))
+                                .collect(Collectors.toList());
+
+                double totalEarnings = vendorOrders.stream()
+                                .filter(o -> o.getStatus() == Order.OrderStatus.READY_FOR_DELIVERY)
+                                .mapToDouble(o -> o.getTotalPrice() != null ? o.getTotalPrice() : 0.0)
+                                .sum();
+
+                double pendingEarnings = vendorOrders.stream()
+                                .filter(o -> o.getStatus() == Order.OrderStatus.ACCEPTED
+                                                || o.getStatus() == Order.OrderStatus.IN_PRODUCTION)
+                                .mapToDouble(o -> o.getTotalPrice() != null ? o.getTotalPrice() : 0.0)
+                                .sum();
+
+                long completedCount = vendorOrders.stream()
+                                .filter(o -> o.getStatus() == Order.OrderStatus.READY_FOR_DELIVERY)
+                                .count();
+
+                java.util.Map<String, Object> result = new java.util.HashMap<>();
+                result.put("totalEarnings", totalEarnings);
+                result.put("pendingEarnings", pendingEarnings);
+                result.put("completedOrders", completedCount);
+                result.put("totalOrders", (long) vendorOrders.size());
+                return result;
+        }
+
         public OrderDTO updateStatus(String orderId, OrderStatus newStatus) {
                 Order order = orderRepository.findById(orderId)
                                 .orElseThrow(() -> new RuntimeException("Order not found"));
                 order.setStatus(newStatus);
                 return mapToDTO(orderRepository.save(order));
+        }
+
+        public void deleteOrder(String orderId) {
+                if (!orderRepository.existsById(orderId)) {
+                        throw new RuntimeException("Order not found with ID: " + orderId);
+                }
+                orderRepository.deleteById(orderId);
         }
 
         private OrderDTO mapToDTO(Order order) {
@@ -119,6 +166,7 @@ public class OrderService {
                                 order.getDesignUrl(),
                                 order.getDesignJson(),
                                 order.getTotalPrice(),
-                                order.getCustomer() != null ? order.getCustomer().getName() : "Anonymous");
+                                order.getCustomer() != null ? order.getCustomer().getName() : "Anonymous",
+                                order.getAddress());
         }
 }

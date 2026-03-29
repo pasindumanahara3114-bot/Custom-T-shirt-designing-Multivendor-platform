@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { ChevronLeft, Upload, Package, Calendar, User, Mail, Layers, Ruler } from 'lucide-react';
+import { ChevronLeft, Upload, Package, Calendar, User, Mail, Layers, Ruler, MapPin } from 'lucide-react';
 import { orderService } from '../../api';
 import MainLayout from '../../layouts/MainLayout.jsx';
 
@@ -19,7 +19,8 @@ const OrderPage = () => {
         material: config?.material || 'cotton',
         quantity: config?.quantity || 1,
         expectedDate: '',
-        size: 'M'
+        size: 'M',
+        address: ''
     });
 
     const [previewImage, setPreviewImage] = useState(designs?.frontPreview || null);
@@ -56,6 +57,7 @@ const OrderPage = () => {
                 designUrl: previewImage,
                 designJson: designJSON,
                 vendorId: provider.id,
+                address: formData.address,
                 status: 'PLACED'
             };
 
@@ -107,6 +109,19 @@ const OrderPage = () => {
                                 className="field"
                                 placeholder="Your Name"
                                 value={formData.name}
+                                onChange={handleInputChange}
+                            />
+                        </div>
+
+                        <div className="form-group">
+                            <label><MapPin size={16} /> Delivery Address</label>
+                            <input
+                                type="text"
+                                name="address"
+                                required
+                                className="field"
+                                placeholder="Your full address (e.g., 123 Main St, City)"
+                                value={formData.address}
                                 onChange={handleInputChange}
                             />
                         </div>

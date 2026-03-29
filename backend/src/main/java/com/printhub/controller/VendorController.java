@@ -34,6 +34,11 @@ public class VendorController {
         return ResponseEntity.ok(vendorService.getVendorById(id));
     }
 
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<VendorProfile> getVendorByUserId(@PathVariable Long userId) {
+        return ResponseEntity.ok(vendorService.getVendorByUserId(userId));
+    }
+
     /**
      * Returns eligible vendors filtered by material and quantity.
      * Returns VendorDTO (safe — no password/user fields).

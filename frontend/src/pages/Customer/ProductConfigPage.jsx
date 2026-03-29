@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { vendorService } from '../../api';
+import { SUPPORTED_MATERIALS } from '../../utils/constants';
 import MainLayout from '../../layouts/MainLayout.jsx';
 import ProviderCard from '../../components/shared/ProviderCard.jsx';
 
@@ -13,7 +14,7 @@ const ProductConfigPage = () => {
     const location = useLocation();
     const { designs } = location.state || { designs: null };
 
-    const [material, setMaterial] = useState('cotton');
+    const [material, setMaterial] = useState(SUPPORTED_MATERIALS[0].toLowerCase());
     const [quantity, setQuantity] = useState(10);
     const [providers, setProviders] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -55,8 +56,9 @@ const ProductConfigPage = () => {
                         onChange={(e) => setMaterial(e.target.value)}
                         className="field"
                     >
-                        <option value="cotton">Cotton</option>
-                        <option value="polyester">Polyester</option>
+                        {SUPPORTED_MATERIALS.map(m => (
+                            <option key={m} value={m.toLowerCase()}>{m}</option>
+                        ))}
                     </select>
                     <label style={{ marginTop: '16px' }}>Quantity</label>
                     <input

@@ -29,7 +29,7 @@ public class VendorProfile {
     private String contact;
     private String location;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "LONGTEXT")
     private String description;
 
     @Column(name = "min_qty")

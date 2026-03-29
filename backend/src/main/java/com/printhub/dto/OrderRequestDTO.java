@@ -15,4 +15,5 @@ public class OrderRequestDTO {
     private Long vendorId;
     private String status;
     private LocalDate expectedDate;
+    private String address;
 }

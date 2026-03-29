@@ -5,7 +5,9 @@
 package com.printhub.controller;
 
 import com.printhub.dto.UserDTO;
+import com.printhub.model.CustomerProfile;
 import com.printhub.model.User;
+import com.printhub.model.VendorProfile;
 import com.printhub.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -39,5 +41,18 @@ public class AuthController {
         return userService.getUserByEmail(email)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping("/profile/customer/{userId}")
+    public ResponseEntity<UserDTO> setupCustomerProfile(@PathVariable Long userId,
+            @RequestBody CustomerProfile profile) {
+        System.out.println("Processing customer profile for ID: " + userId);
+        return ResponseEntity.ok(userService.setupCustomerProfile(userId, profile));
+    }
+
+    @PostMapping("/profile/vendor/{userId}")
+    public ResponseEntity<UserDTO> setupVendorProfile(@PathVariable Long userId, @RequestBody VendorProfile profile) {
+        System.out.println("Processing vendor profile for ID: " + userId);
+        return ResponseEntity.ok(userService.setupVendorProfile(userId, profile));
     }
 }

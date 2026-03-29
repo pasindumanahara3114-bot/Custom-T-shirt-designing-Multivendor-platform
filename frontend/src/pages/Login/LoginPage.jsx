@@ -3,9 +3,11 @@ import { Lock, LogIn, Mail } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { authService } from '../../api';
 import MainLayout from '../../layouts/MainLayout.jsx';
+import { useAuth } from '../../context/AuthContext';
 
 const LoginPage = () => {
     const navigate = useNavigate();
+    const { login } = useAuth();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [formData, setFormData] = useState({
@@ -30,13 +32,21 @@ const LoginPage = () => {
             });
 
             console.log("Login successful:", user);
+            login(user); // Persist to context and localStorage
 
-            // Role-based redirection
-            if (user.role === 'CUSTOMER') {
+            // Role-based redirection (Robust checks)
+            const roleStr = user.role?.toUpperCase();
+            const isComplete = user.profileComplete || user.isProfileComplete;
+
+            if (roleStr === 'CUSTOMER') {
                 navigate('/dashboard');
-            } else if (user.role === 'PROVIDER') {
-                navigate('/provider/dashboard');
-            } else if (user.role === 'ADMIN') {
+            } else if (roleStr === 'PROVIDER' || roleStr === 'VENDOR') {
+                if (isComplete) {
+                    navigate('/vendor/dashboard');
+                } else {
+                    navigate('/complete-profile');
+                }
+            } else if (roleStr === 'ADMIN') {
                 navigate('/admin');
             } else {
                 navigate('/');

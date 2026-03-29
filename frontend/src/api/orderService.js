@@ -101,14 +101,44 @@ const orderService = {
     },
 
     /**
-     * Downloads the HD design preview for a specific order.
+     * Downloads or opens the HD design preview for a specific order.
      * @param {string} orderId - The ORD- identifier.
      */
     downloadHDPreview: async (orderId) => {
         try {
-            window.open(`${API.defaults.baseURL}/orders/${orderId}/hd-preview`, '_blank');
+            const url = `${API.defaults.baseURL}/orders/${orderId}/hd-preview`;
+            window.open(url, '_blank');
         } catch (error) {
             console.error("Download HD preview error:", error);
+            throw error;
+        }
+    },
+
+    /**
+     * Retrieves total earnings breakdown for a vendor.
+     * @param {number} vendorId - The vendor profile ID.
+     * @returns {Promise<Object>} { totalEarnings, pendingEarnings, completedOrders, totalOrders }
+     */
+    getVendorEarnings: async (vendorId) => {
+        try {
+            const response = await API.get(`/orders/vendor/${vendorId}/earnings`);
+            return response.data;
+        } catch (error) {
+            console.error("Fetch vendor earnings error:", error);
+            throw error;
+        }
+    },
+
+    /**
+     * Deletes an order from the system.
+     * @param {string} orderId - The ORD- identifier.
+     * @returns {Promise<void>}
+     */
+    deleteOrder: async (orderId) => {
+        try {
+            await API.delete(`/orders/${orderId}`);
+        } catch (error) {
+            console.error("Delete order error:", error);
             throw error;
         }
     },

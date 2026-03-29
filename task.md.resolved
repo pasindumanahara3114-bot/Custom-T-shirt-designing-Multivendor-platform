@@ -1,0 +1,14 @@
+# Vendor Design Component Extraction Tasks
+- [ ] Plan and Finalize Approach with User
+  - [ ] Clarify Text Layer PNG extraction
+  - [ ] Clarify Customer Image save/download
+- [ ] Frontend: [ControlPanel.jsx](file:///c:/Users/Administrator/Desktop/T-shirt/Custom-T-shirt-designing-Multivendor-platform/frontend/src/features/design-tool/components/ControlPanel.jsx) & Design Tool
+  - [ ] Structure exported JSON into logical `front` and `back` components
+  - [ ] Ensure original uploaded high-res image data or references are preserved in JSON
+- [ ] Frontend: [VendorDashboard.jsx](file:///c:/Users/Administrator/Desktop/T-shirt/Custom-T-shirt-designing-Multivendor-platform/frontend/src/pages/Provider/VendorDashboard.jsx) (Extraction Logic)
+  - [ ] Add "Download Layer" button for individual components
+  - [ ] Implement isolated Fabric.js canvas logic for generating Text-to-PNG
+  - [ ] Group layers visually by Front/Back
+- [ ] Verification
+  - [ ] Verify vendor can extract transparent text components
+  - [ ] Verify original HD image layers are downloadable
